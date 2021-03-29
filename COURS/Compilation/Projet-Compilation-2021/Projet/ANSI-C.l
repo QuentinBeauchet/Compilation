@@ -3,6 +3,7 @@ L                       [a-zA-Z_]
 H                       [a-fA-F0-9]
 
 %{
+#include "types.h"
 #include <stdio.h>
 #include "y.tab.h"
 
@@ -21,13 +22,19 @@ H                       [a-fA-F0-9]
 "extern"                { return EXTERN; }
 "for"                   { return FOR; }
 "if"                    { return IF; }
-"int"                   { return INT; }
 "return"                { return RETURN; }
 "switch"                { return SWITCH; }
-"void"                  { return VOID; }
 "while"                 { return WHILE; }
 
-{L}({L}|{D})*           { return IDENTIFICATEUR; }
+"int"                 { yylval.type=strdup(yytext); 
+			return INT; }
+"void"                { yylval.type=strdup(yytext); 
+			return VOID; }
+
+"EOF"     		{ return END_OF_FILE; }
+
+{L}({L}|{D})*         { yylval.nom = strdup(yytext);
+			return IDENTIFICATEUR; }
 
 "/"                   	{ return DIV; }
 "+"                    	{ return PLUS; }
@@ -49,5 +56,6 @@ H                       [a-fA-F0-9]
 
 [ \t\v\n\f]             { /* A completer */ }
 .                       { return yytext[0]; }
+
 %%
 

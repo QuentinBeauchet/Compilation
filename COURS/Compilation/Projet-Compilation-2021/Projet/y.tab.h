@@ -47,9 +47,9 @@ extern int yydebug;
   {
     IDENTIFICATEUR = 258,
     CONSTANTE = 259,
-    VOID = 260,
+    FOR = 260,
     INT = 261,
-    FOR = 262,
+    VOID = 262,
     WHILE = 263,
     IF = 264,
     ELSE = 265,
@@ -76,17 +76,18 @@ extern int yydebug;
     NEQ = 286,
     NOT = 287,
     EXTERN = 288,
-    THEN = 289,
-    OP = 290,
-    REL = 291
+    END_OF_FILE = 289,
+    THEN = 290,
+    OP = 291,
+    REL = 292
   };
 #endif
 /* Tokens.  */
 #define IDENTIFICATEUR 258
 #define CONSTANTE 259
-#define VOID 260
+#define FOR 260
 #define INT 261
-#define FOR 262
+#define VOID 262
 #define WHILE 263
 #define IF 264
 #define ELSE 265
@@ -113,13 +114,28 @@ extern int yydebug;
 #define NEQ 286
 #define NOT 287
 #define EXTERN 288
-#define THEN 289
-#define OP 290
-#define REL 291
+#define END_OF_FILE 289
+#define THEN 290
+#define OP 291
+#define REL 292
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+
+union YYSTYPE
+{
+#line 41 "miniC.y" /* yacc.c:1909  */
+
+	char* type;
+	int val;
+	char* nom;
+	listof_param_t listof_var;
+	param_t var;
+
+#line 136 "y.tab.h" /* yacc.c:1909  */
+};
+
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif

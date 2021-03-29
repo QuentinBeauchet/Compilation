@@ -1,10 +1,22 @@
 %{
+#include "types.c"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+void print_param(param_t t);
+void print_fonction(fonction_t f);
+listof_param_t append_listof_param(listof_param_t tab,param_t t);
+
+param_t tab[100];
+int tab_index=0;
+int read=1;	
+
 %}
-%token IDENTIFICATEUR CONSTANTE VOID INT FOR WHILE IF ELSE SWITCH CASE DEFAULT
+%token IDENTIFICATEUR CONSTANTE FOR INT VOID WHILE IF ELSE SWITCH CASE DEFAULT
 %token BREAK RETURN PLUS MOINS MUL DIV LSHIFT RSHIFT BAND BOR LAND LOR LT GT 
 %token GEQ LEQ EQ NEQ NOT EXTERN
+%token END_OF_FILE
 %left PLUS MOINS
 %left MUL DIV
 %left LSHIFT RSHIFT
@@ -16,102 +28,129 @@
 %left REL
 %start programme
 %error-verbose
+
+//%type liste_declarations liste_fonctions fonction type liste_parms
+
+%type<val> GEQ LEQ EQ NEQ NOT PLUS MOINS MUL DIV LSHIFT RSHIFT BAND BOR LAND LOR LT GT 
+%type<type> type INT VOID
+%type<nom> IDENTIFICATEUR
+%type<var> parm
+%type<listof_var> liste_parms
+
+
+%union{
+	char* type;
+	int val;
+	char* nom;
+	listof_param_t listof_var;
+	param_t var;
+}
+
 %%
 programme	:	
-		liste_declarations liste_fonctions {printf("programme: liste_declarations: %s liste_fonctions: %s",$1,$2);}
+		liste_declarations liste_fonctions 
 ;
 liste_declarations	:	
-		liste_declarations declaration {printf("liste_declarations: liste_declarations: %s declaration: %s",$1,$2);}
+		liste_declarations declaration 
 	|	
 ;
 liste_fonctions	:	
-		liste_fonctions fonction {printf("liste_fonctions: liste_fonctions: %s fonction: %s",$1,$2);}
-	|       fonction {printf("liste_fonctions: fonction: %s",$1);};
+		liste_fonctions fonction 
+	|       fonction 
 ;
 declaration	:	
-		type liste_declarateurs ';' {printf("declaration: type: %s liste_declarateurs: %s ;",$1,$2);}
+		type liste_declarateurs ';' 
 ;
 liste_declarateurs	:	
-		liste_declarateurs ',' declarateur {printf("liste_declarateurs: liste_declarateurs: %s , declarateur: %s ;",$1,$3);}
-	|	declarateur {printf("liste_declarateurs: declarateur: %s",$1);}
+		liste_declarateurs ',' declarateur 
+	|	declarateur 
 ;
 declarateur	:	
-		IDENTIFICATEUR {printf("declarateur: IDENTIFICATEUR: %s",$1);}
-	|	declarateur '[' CONSTANTE ']' {printf("declarateur: [ CONSTANTE ]: %s",$1);}
+		IDENTIFICATEUR 
+	|	declarateur '[' CONSTANTE ']' 
 ;
 fonction	:	
-		type IDENTIFICATEUR '(' liste_parms ')' '{' liste_declarations liste_instructions '}' {printf("fonction: type: %s  IDENTIFICATEUR: %s ( liste_parms: %s ) { liste_declarations: %s liste_instructions: %s }",$1,$2,$4,$7,$8);}
-	|	EXTERN type IDENTIFICATEUR '(' liste_parms ')' ';'  {printf("fonction: EXTERN: %s type: %s IDENTIFICATEUR: %s ( liste_parms: %s ) ;",$1,$2,$3,$5);}
+		type IDENTIFICATEUR '(' liste_parms ')' '{' liste_declarations liste_instructions '}' 
+	|	EXTERN type IDENTIFICATEUR '(' liste_parms ')' ';'  	{fonction_t f = { .args = $5, .nom = $3, .type = $2};
+									print_fonction(f);} 	
+	|	END_OF_FILE 	{read=0;
+				return;}
 ;
 type	:	
-		VOID {printf("type: VOID: %s",$1);}
-	|	INT {printf("type: INT: %s",$1);}
+		VOID 
+	|	INT	
 ;
 liste_parms	:	
-		liste_parms ',' parm {printf("list_parms: liste_parms: %s , parm: %s",$1,$3);}
-	|	{printf("list_parms:");}
+		parm 			{listof_param_t l = { .size = 0};
+					yylval.listof_var=append_listof_param(l,$1);
+					print_listof_param(yylval.listof_var);}
+	|	parm ',' liste_parms 	{yylval.listof_var=append_listof_param($3,$1);}
 ;
 parm	:	
-		INT IDENTIFICATEUR {printf("parm: INT: %s IDENTIFICATEUR: %s",$1,$2);}
+		INT IDENTIFICATEUR 	{param_t t = { .type = $1, .nom = $2,};
+            				yylval.var = t;}
+					//tab[tab_index] = t;
+					//print_param(t);
+					//tab_index=tab_index+1;}
 ;
 liste_instructions :	
-		liste_instructions instruction {printf("liste_instructions: liste_instructions: %s instruction: %s",$1,$2);}
-	|	{printf("liste_instructions:");}
+		liste_instructions instruction 
+	|	
 ;
 instruction	:	
-		iteration {printf("instruction: iteration: %s",$1);}
-	|	selection {printf("instruction: selection: %s",$1);}
-	|	saut {printf("instruction: saut: %s",$1);}
-	|	affectation ';' {printf("instruction: affactation: %s ;",$1);}
-	|	bloc {printf("instruction: bloc: %s",$1);}
-	|	appel {printf("instruction: appel: %s",$1);}
+		iteration 
+	|	selection 
+	|	saut 
+	|	affectation ';' 
+	|	bloc 
+	|	appel 
 ;
 iteration	:	
-		FOR '(' affectation ';' condition ';' affectation ')' instruction {printf("iteration: FOR: %s ( affectation: %s ; condition: %s ; affectation:%s ) instruction: %s",$1,$3,$5,$7,$9);}
-	|	WHILE '(' condition ')' instruction {printf("iteration: WHILE: %s ( condition: %s ) instruction: %s",$1,$3,$5);}
+		FOR '(' affectation ';' condition ';' affectation ')' instruction 
+	|	WHILE '(' condition ')' instruction 
 ;
 selection	:	
-		IF '(' condition ')' instruction %prec THEN {printf("selection: IF: %s ( condition: %s ) instruction: %s ",$1,$3,$5);}
-	|	IF '(' condition ')' instruction ELSE instruction {printf("selection: IF: %s ( condition: %s ) instruction: %s ELSE: %s instruction: %s",$1,$3,$5,$6,$7);}
-	|	SWITCH '(' expression ')' instruction {printf("selection: SWITCH: %s ( expression: %s ) instruction: %s",$1,$3,$5);}
-	|	CASE CONSTANTE ':' instruction {printf("selection: CASE: %s CONSTANTE: %s : instruction: %s",$1,$2,$4);}
-	|	DEFAULT ':' instruction {printf("selection: DEFAULT: %s : instruction: %s",$1,$3);}
+		IF '(' condition ')' instruction %prec THEN 
+	|	IF '(' condition ')' instruction ELSE instruction 
+	|	SWITCH '(' expression ')' instruction 
+	|	CASE CONSTANTE ':' instruction 
+	|	DEFAULT ':' instruction 
 ;
 saut	:	
-		BREAK ';' {printf("saut: BREAK: %s ;",$1);}
-	|	RETURN ';' {printf("saut: RETURN: %s ;",$1);}
-	|	RETURN expression ';' {printf("saut: RETURN: %s expression: %s ;",$1,$2);}
+		BREAK ';' 
+	|	RETURN ';' 
+	|	RETURN expression ';' 
 ;
 affectation	:	
-		variable '=' expression {printf("affectation: variable: %s = expression: %s",$1,$3);}
+		variable '=' expression 
 ;
 bloc	:	
-		'{' liste_declarations liste_instructions '}' {printf("bloc: { liste_declarations: %s liste_instructions: %s }",$2,$3);}
+		'{' liste_declarations liste_instructions '}' 
 ;
 appel	:	
-		IDENTIFICATEUR '(' liste_expressions ')' ';' {printf("appel: IDENTIFICATEUR: %s ( liste_instructions: %s ) ;",$1,$3);}
+		IDENTIFICATEUR '(' liste_expressions ')' ';' 
 ;
 variable	:	
-		IDENTIFICATEUR {printf("variable: IDENTIFICATEUR: %s ",$1);}
-	|	variable '[' expression ']' {printf("variable: variable: %s [ expression: %s ]",$1,$3);}
+		IDENTIFICATEUR 
+	|	variable '[' expression ']' 
 ;
 expression	:	
-		'(' expression ')' {printf("expression: ( expression: %s )",$2);}
-	|	expression binary_op expression %prec OP {printf("expression: expression: %s binary_op: %s expression: %s",$1,$2,$3);}
-	|	MOINS expression {printf("expression: MOINS: %s expression: %s",$1,$2);}
-	|	CONSTANTE {printf("expression: CONSTANTE: %s"),$1;}
-	|	variable {printf("expression: variable: %s"),$1;}
-	|	IDENTIFICATEUR '(' liste_expressions ')' {printf("expression: IDENTIFICATEUR: %s ( liste_expressions: %s )",$1,$3);}
+		'(' expression ')' 
+	|	expression binary_op expression %prec OP 
+	|	MOINS expression 
+	|	CONSTANTE 
+	|	variable 
+	|	IDENTIFICATEUR '(' liste_expressions ')' 
 ;
 liste_expressions	:	
-		liste_expressions ',' expression {printf("liste_expressions: liste_expressions: %s , expression: %s",$1,$3);}
+		liste_expressions ',' expression 
 	|
 ;
 condition	:	
-		NOT '(' condition ')' {printf("condition: NOT: %s ( condition: %s )",$1,$3);}
-	|	condition binary_rel condition %prec REL {printf("condition: condition: %s binary_rel: %s condition: %s",$1,$2,$3);}
-	|	'(' condition ')' {printf("condition: ( condition: %s )",$2);}
-	|	expression binary_comp expression {printf("condition: expression: %s binary_op: %s expression: %s",$1,$2,$3);}
+		NOT '(' condition ')' 
+	|	condition binary_rel condition %prec REL 
+	|	'(' condition ')' 
+	|	expression binary_comp expression 
 ;
 binary_op	:	
 		PLUS {printf("binary_op: PLUS: %s",$1);}
@@ -135,13 +174,26 @@ binary_comp	:
 	|	EQ {printf("binary_comp: EQ: %d",$1);}
 	|	NEQ {printf("binary_comp: NEQ: %d",$1);}
 ;
+
 %%
  
 void yyerror (char const *s){
-  fprintf (stderr, "ERREUR:%s\n", s);
+  	fprintf (stderr, "ERREUR: %s\n", s);
 }
 
 int main(){
-	while(1) 
+	int nbrErrorMax=0;
+	while(read){
 		yyparse();
+		/*nbrErrorMax= nbrErrorMax + yyparse();
+		if(nbrErrorMax>20){
+			{printf("TROP D'ERREURS\n");}
+			break;
+		}*/
+	}
+	/*if(tab_index>0){
+		for (int i = 0; i < tab_index; ++i){
+    			print_param(tab[i]);
+  		}
+	}*/
 }
