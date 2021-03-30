@@ -6,6 +6,14 @@ void print_param(param_t t){
 	printf("Param_t: %s %s = %d\n",t.type,t.nom,t.val);
 }
 
+listof_param_t concat_listof_param(listof_param_t tab,listof_param_t t){
+	if(t.size>0){
+		tab.list[tab.size]=t.list[0];
+		tab.size=tab.size+1;
+	}
+	return tab;
+}
+
 listof_param_t append_listof_param(listof_param_t tab,param_t t){
 	tab.list[tab.size]=t;
 	tab.size=tab.size+1;

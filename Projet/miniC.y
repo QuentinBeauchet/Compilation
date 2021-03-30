@@ -7,6 +7,7 @@
 void print_param(param_t t);
 void print_fonction(fonction_t f);
 listof_param_t append_listof_param(listof_param_t tab,param_t t);
+listof_param_t concat_listof_param(listof_param_t tab,listof_param_t t);
 
 param_t tab[100];
 int tab_index=0;
@@ -34,8 +35,7 @@ int read=1;
 %type<val> GEQ LEQ EQ NEQ NOT PLUS MOINS MUL DIV LSHIFT RSHIFT BAND BOR LAND LOR LT GT 
 %type<type> type INT VOID
 %type<nom> IDENTIFICATEUR CONSTANTE
-%type<var> parm
-%type<listof_var> liste_parms
+%type<listof_var> liste_parms parm
 
 
 %union{
@@ -86,16 +86,17 @@ type	:
 	|	INT	
 ;
 liste_parms	:	
-		parm 			{listof_param_t l = { .size = 0};
-					print_param($1);
-					yylval.listof_var=append_listof_param(l,$1);
-					print_listof_param(yylval.listof_var);}
-	|	parm ',' liste_parms 	{yylval.listof_var=append_listof_param($3,$1);}
+		parm 			{//print_listof_param(yylval.listof_var);
+					yylval.listof_var=$1;}
+	|	parm ',' liste_parms 	{yylval.listof_var=concat_listof_param($3,$1);}
 ;
 parm	:	
 		INT IDENTIFICATEUR 	{param_t t = { .type = $1, .nom = $2,};
-            				yylval.var = t;
-					print_param(t);}
+					//print_param(t);
+					listof_param_t l = { .size = 0};
+					yylval.listof_var=append_listof_param(l,t);}
+	|				{listof_param_t l = { .size = 0};
+					yylval.listof_var=l;}
 ;
 liste_instructions :	
 		liste_instructions instruction 

@@ -14,6 +14,8 @@ typedef struct _listof_param_t {
 } listof_param_t;
 
 listof_param_t append_listof_param(listof_param_t tab,param_t t);
+listof_param_t concat_listof_param(listof_param_t tab,listof_param_t t);
+
 
 typedef struct _fonction_t {
 	listof_param_t args;
