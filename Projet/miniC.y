@@ -36,7 +36,8 @@ int read=1;
 %type<type> type INT VOID
 %type<nom> IDENTIFICATEUR CONSTANTE
 %type<listof_var> liste_parms parm
-
+%type<listof_declarateur> liste_declarateurs declarateur
+%type<listof_declaration> liste_declarations declaration
 
 %union{
 	char* type;
@@ -46,7 +47,9 @@ int read=1;
 	param_t var;
 	declarateur_t* declarateur_p;
 	declarateur_t declarateur;
-
+	listof_declarateur_t listof_declarateur;
+	declaration_t declaration;
+	listof_declaration_t listof_declaration;
 }
 
 %%
@@ -54,25 +57,26 @@ programme	:
 		liste_declarations liste_fonctions 
 ;
 liste_declarations	:	
-		liste_declarations declaration 
-	|	
+		liste_declarations ',' declaration 	{yylval.listof_declaration=concat_listof_declaration_t($3,$1);}
+	|	declaration				{yylval.listof_declaration=$1;}
 ;
 liste_fonctions	:	
 		liste_fonctions fonction 
 	|       fonction 
 ;
 declaration	:	
-		type liste_declarateurs ';' 
+		type liste_declarateurs ';' 		{yylval.declaration = $1;}
 ;
 liste_declarateurs	:	
-		liste_declarateurs ',' declarateur 
-	|	declarateur 
+		liste_declarateurs ',' declarateur 	{yylval.listof_declarateur=concat_listof_declarateur_t($3,$1);}
+	|	declarateur 				{yylval.listof_declarateur=$1;}
 ;
 declarateur	:	
 		IDENTIFICATEUR {declarateur_t d = { .identificateur = $1};
 				yylval.declarateur = d;}
 	|	declarateur '[' CONSTANTE ']' 	{declarateur_t d = { .d = yylval.declarateur_p , .constante = yylval.nom};
 						yylval.declarateur = d;}
+	
 ;
 fonction	:	
 		type IDENTIFICATEUR '(' liste_parms ')' '{' liste_declarations liste_instructions '}' 
