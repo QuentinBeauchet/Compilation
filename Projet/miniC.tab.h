@@ -34,8 +34,8 @@
 /* Undocumented macros, especially those whose name start with YY_,
    are private implementation details.  Do not rely on them.  */
 
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
+#ifndef YY_YY_MINIC_TAB_H_INCLUDED
+# define YY_YY_MINIC_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -49,85 +49,49 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    INT = 258,
-    VOID = 259,
-    IDENTIFICATEUR = 260,
-    CONSTANTE = 261,
-    PLUS = 262,
-    MOINS = 263,
-    MUL = 264,
-    DIV = 265,
-    LSHIFT = 266,
-    RSHIFT = 267,
-    BAND = 268,
-    BOR = 269,
-    LT = 270,
-    GT = 271,
-    GEQ = 272,
-    LEQ = 273,
-    EQ = 274,
-    NEQ = 275,
-    NOT = 276,
-    LAND = 277,
-    LOR = 278,
-    EXTERN = 279,
-    RETURN = 280,
-    BREAK = 281,
-    ELSE = 282,
-    FOR = 283,
-    WHILE = 284,
-    IF = 285,
-    SWITCH = 286,
-    CASE = 287,
-    DEFAULT = 288,
+    FOR = 258,
+    WHILE = 259,
+    INT = 260,
+    VOID = 261,
+    IDENTIFICATEUR = 262,
+    CONSTANTE = 263,
+    PLUS = 264,
+    MOINS = 265,
+    MUL = 266,
+    DIV = 267,
+    LSHIFT = 268,
+    RSHIFT = 269,
+    BAND = 270,
+    BOR = 271,
+    LT = 272,
+    GT = 273,
+    GEQ = 274,
+    LEQ = 275,
+    EQ = 276,
+    NEQ = 277,
+    NOT = 278,
+    LAND = 279,
+    LOR = 280,
+    EXTERN = 281,
+    RETURN = 282,
+    BREAK = 283,
+    ELSE = 284,
+    CASE = 285,
+    DEFAULT = 286,
+    IF = 287,
+    SWITCH = 288,
     END_OF_FILE = 289,
     THEN = 290,
     OP = 291,
     REL = 292
   };
 #endif
-/* Tokens.  */
-#define INT 258
-#define VOID 259
-#define IDENTIFICATEUR 260
-#define CONSTANTE 261
-#define PLUS 262
-#define MOINS 263
-#define MUL 264
-#define DIV 265
-#define LSHIFT 266
-#define RSHIFT 267
-#define BAND 268
-#define BOR 269
-#define LT 270
-#define GT 271
-#define GEQ 272
-#define LEQ 273
-#define EQ 274
-#define NEQ 275
-#define NOT 276
-#define LAND 277
-#define LOR 278
-#define EXTERN 279
-#define RETURN 280
-#define BREAK 281
-#define ELSE 282
-#define FOR 283
-#define WHILE 284
-#define IF 285
-#define SWITCH 286
-#define CASE 287
-#define DEFAULT 288
-#define END_OF_FILE 289
-#define THEN 290
-#define OP 291
-#define REL 292
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 60 "miniC.y"
+#line 62 "miniC.y"
 
 	char* type;
 	char* identificateur;
@@ -136,7 +100,8 @@ union YYSTYPE
 	char* binary_op;
 	char* binary_rel;
 	char* binary_comp;
-	char* selection_nom;
+	char* switch_case;
+	char* selection_type;
 	
 	struct parm_t parm;
 	struct liste_parms_t liste_parms;
@@ -147,20 +112,20 @@ union YYSTYPE
 	struct variable_t variable;
 	struct liste_expressions_t liste_expressions;
 	struct expression_t expression;
-	struct condition_t condition;
-	struct appel_t appel;
-	struct affectation_t affectation;
-	struct saut_t saut;
-	struct bloc_t bloc;
-	struct selection_t selection;
+	struct condition_t* condition;
+	struct appel_t* appel;
+	struct affectation_t* affectation;
+	struct saut_t* saut;
+	struct bloc_t* bloc;
+	struct selection_t* selection;
 	struct instruction_t instruction;
 	struct liste_instructions_t liste_instructions;
-	struct iteration_t iteration;
+	struct iteration_t* iteration;
 	struct fonction_t fonction;
 	struct liste_fonctions_t liste_fonctions;
 	struct programme_t programme;
 
-#line 164 "y.tab.h"
+#line 129 "miniC.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -173,4 +138,4 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
+#endif /* !YY_YY_MINIC_TAB_H_INCLUDED  */

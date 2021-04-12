@@ -1,0 +1,235 @@
+%{
+#include "types.c"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int read=1;
+
+/* Variables globales */
+struct liste_parms_t global_liste_parms = { .size = 0};
+struct liste_parms_t* ptr_global_liste_parms = &global_liste_parms;
+
+struct liste_declarateurs_t global_liste_declarateurs = { .size = 0};
+struct liste_declarateurs_t* ptr_global_liste_declarateurs = &global_liste_declarateurs;
+
+void reset_global_liste_parms(){
+	struct liste_parms_t tab = { .size = 0};
+	global_liste_parms = tab;
+}
+
+void reset_global_liste_declarateurs(){
+	struct liste_declarateurs_t tab = { .size = 0};
+	global_liste_declarateurs = tab;
+}
+
+%}
+%token IDENTIFICATEUR CONSTANTE FOR INT VOID WHILE IF ELSE SWITCH CASE DEFAULT
+%token BREAK RETURN PLUS MOINS MUL DIV LSHIFT RSHIFT BAND BOR LAND LOR LT GT 
+%token GEQ LEQ EQ NEQ NOT EXTERN
+%token END_OF_FILE
+%left PLUS MOINS
+%left MUL DIV
+%left LSHIFT RSHIFT
+%left BOR BAND
+%left LAND LOR
+%nonassoc THEN
+%nonassoc ELSE
+%left OP
+%left REL
+%start programme
+%error-verbose
+
+%type<type> type
+%type<liste_parms> liste_parms
+%type<declarateur> declarateur
+%type<liste_declarateurs> liste_declarateurs
+%type<declaration> declaration
+%type<liste_declarations> liste_declarations
+%type<operateur> binary_op binary_rel binary_comp
+%type<variable> variable
+%type<liste_expressions> liste_expressions
+%type<expression> expression
+
+%union{
+	char* type;
+	char* identificateur;
+	int constante;
+	bool boolean;
+	char* operateur;
+	
+	struct liste_parms_t* liste_parms;
+	struct declarateurs_t* declarateur;
+	struct liste_declarateurs_t* liste_declarateurs;
+	struct declaration_t* declaration;
+	struct liste_declarations_t* liste_declarations;
+	struct variable_t* variable;
+	struct list_expression_t* liste_expressions;
+	struct expression_t* expression;
+}
+
+%%
+programme	:	
+		liste_declarations liste_fonctions 
+;
+liste_declarations	:
+		liste_declarations declaration 		{struct liste_declarations_t* d = yylval.liste_declarations;
+								append_liste_declarations(d,$2);
+								yylval.liste_declarations=d;}
+	|							{struct liste_declarations_t d = { .size = 0};	
+								yylval.liste_declarations=&d;}	
+;
+liste_fonctions	:	
+		liste_fonctions fonction 
+	|       fonction 
+;
+declaration	:	
+		type liste_declarateurs ';' 			{struct declaration_t d = { .type = yylval.type, .declarateurs = copyOf_liste_declarateurs(yylval.liste_declarateurs)};
+								reset_global_liste_declarateurs();
+								yylval.declaration = &d;}
+;
+liste_declarateurs	:	
+		liste_declarateurs ',' declarateur 		{yylval.liste_declarateurs = ptr_global_liste_declarateurs;}
+	|	declarateur 					{yylval.liste_declarateurs = ptr_global_liste_declarateurs;}
+;
+declarateur	:	
+		IDENTIFICATEUR 				{struct declarateur_t d = { .identificateur = $1};
+								append_liste_declarateurs(ptr_global_liste_declarateurs,&d);
+								yylval.declarateur=&d;}
+	|	declarateur '[' CONSTANTE ']' 		{struct declarateur_t* d = yylval.declarateur;
+								append_declarateur(d,$3);
+								append_liste_declarateurs(ptr_global_liste_declarateurs,d);
+								yylval.declarateur=d;}
+	
+;
+fonction	:	
+		type IDENTIFICATEUR '(' liste_parms ')' '{' liste_declarations liste_instructions '}' 	{struct fonction_t f = { .liste_parms = copyOf_liste_parms(yylval.liste_parms),
+														.liste_declarations = $7, .identificateur = $2, .type = $1};
+														reset_global_liste_parms();
+														print_fonction(f);}
+	|	EXTERN type IDENTIFICATEUR '(' liste_parms ')' ';'  						{struct fonction_t f = { .Extern = yylval.boolean, .liste_parms = 															copyOf_liste_parms(yylval.liste_parms), 
+														.identificateur = $3, .type = yylval.type};
+														reset_global_liste_parms();
+														print_fonction(f);}
+	|	END_OF_FILE 											{read=0;
+														return;}
+;
+type	:	
+		VOID 
+	|	INT	
+;
+liste_parms	:	
+		parm 			{yylval.liste_parms=ptr_global_liste_parms;}
+	|	parm ',' liste_parms 	{yylval.liste_parms=ptr_global_liste_parms;}
+;
+parm	:	
+		INT IDENTIFICATEUR 	{struct parm_t p = { .type = yylval.type, .identificateur = yylval.identificateur};
+					append_liste_parms(ptr_global_liste_parms,p);}
+	|
+;
+liste_instructions :	
+		liste_instructions instruction 
+	|	
+;
+instruction	:	
+		iteration 
+	|	selection 
+	|	saut 
+	|	affectation ';' 
+	|	bloc 
+	|	appel 
+;
+iteration	:	
+		FOR '(' affectation ';' condition ';' affectation ')' instruction 
+	|	WHILE '(' condition ')' instruction 
+;
+selection	:	
+		IF '(' condition ')' instruction %prec THEN 
+	|	IF '(' condition ')' instruction ELSE instruction 
+	|	SWITCH '(' expression ')' instruction 
+	|	CASE CONSTANTE ':' instruction 
+	|	DEFAULT ':' instruction 
+;
+saut	:	
+		BREAK ';' 
+	|	RETURN ';' 
+	|	RETURN expression ';' 
+;
+affectation	:	
+		variable '=' expression 
+;
+bloc	:	
+		'{' liste_declarations liste_instructions '}' 
+;
+appel	:	
+		IDENTIFICATEUR '(' liste_expressions ')' ';' 
+;
+variable	:	
+		IDENTIFICATEUR 		{struct variable_t var = {.identificateur = yylval.identificateur};
+						yylval.variable=&var;}		
+	|	variable '[' expression ']' 	{struct variable_t* var = yylval.variable;
+						struct liste_expression_t list ={.size = 0 ,.liste = var->liste_expr};
+						append_liste_expressions(&list ,&yylval.expression); 
+						struct variable_t variableFinale = {.identificateur = var->identificateur, .liste_expr = &list};
+						yylval.variable=&variableFinale;}
+						
+;
+expression	:	
+		'(' expression ')' 
+	|	expression binary_op expression %prec OP 
+	|	MOINS expression 
+	|	CONSTANTE 
+	|	variable 
+	|	IDENTIFICATEUR '(' liste_expressions ')' 
+;
+liste_expressions	:	
+		liste_expressions ',' expression 
+	|
+;
+condition	:	
+		NOT '(' condition ')' 
+	|	condition binary_rel condition %prec REL 
+	|	'(' condition ')' 
+	|	expression binary_comp expression 
+;
+binary_op    :    
+        PLUS         	{$$ = yylval.operateur;}
+    |   MOINS         	{$$ = yylval.operateur;}
+    |   MUL         	{$$ = yylval.operateur;}
+    |   DIV         	{$$ = yylval.operateur;}
+    |   LSHIFT     	{$$ = yylval.operateur;}
+    |   RSHIFT     	{$$ = yylval.operateur;}
+    |   BAND         	{$$ = yylval.operateur;}
+    |   BOR         	{$$ = yylval.operateur;}
+;
+binary_rel    :    
+        LAND         	{$$ = yylval.operateur;}
+    |   LOR         	{$$ = yylval.operateur;}
+;
+binary_comp    :    
+        LT         	{$$ = yylval.operateur;}
+    |   GT         	{$$ = yylval.operateur;}
+    |   GEQ         	{$$ = yylval.operateur;}
+    |   LEQ         	{$$ = yylval.operateur;}
+    |   EQ        	{$$ = yylval.operateur;}
+    |   NEQ         	{$$ = yylval.operateur;}
+;
+
+%%
+ 
+void yyerror (char const *s){
+  	fprintf (stderr, "ERREUR: %s\n", s);
+}
+
+int main(){
+	int nbrErrorMax=0;
+	while(read){
+		yyparse();
+		nbrErrorMax= nbrErrorMax + yyparse();
+		if(nbrErrorMax>20){
+			{printf("TROP D'ERREURS\n");}
+			break;
+		}
+	}
+		
+}
