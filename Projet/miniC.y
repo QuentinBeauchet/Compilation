@@ -5,7 +5,7 @@
 #include <string.h>
 
 int yylex();
-void yyerror(const char *s);
+void yyerror (const char *s);
 
 struct programme_t global_programme;
 
@@ -282,8 +282,12 @@ void yyerror (const char *s){
 }
 
 int main(){
-	printf("-----------------------------------------------------------------LEX-----------------------------------------------------------------\n");
+	if(global_debug){
+		printf("-----------------------------------------------------------------LEX-----------------------------------------------------------------\n");
+	}
 	yyparse();
-	printf("-------------------------------------------------------VERIFICATION DES STRUCTS-------------------------------------------------------\n");
-	print_programme(global_programme);
+	if(global_debug){
+		printf("-------------------------------------------------------VERIFICATION DES STRUCTS-------------------------------------------------------\n");
+		print_programme(global_programme);
+	}
 }

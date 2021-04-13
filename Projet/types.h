@@ -1,5 +1,7 @@
 #include <stdbool.h>
 
+static bool global_debug = false;
+
 /* Structures de données */
 
 struct parm_t {

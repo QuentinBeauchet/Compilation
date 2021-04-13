@@ -5,7 +5,10 @@ H                       [a-fA-F0-9]
 %{
 #include "types.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include "y.tab.h"
+
+void debug();
 
 %}
 
@@ -18,111 +21,119 @@ H                       [a-fA-F0-9]
 <C_COMMENT>\n   { }
 <C_COMMENT>.    { }
 
-"break"                {ECHO;printf("\n");
+"break"                {debug();
 			yylval.boolean = false;
 			return BREAK; }
-"else"                 {ECHO;printf("\n");
+"else"                 {debug();
 			yylval.boolean = true;
 			return ELSE; }
-"extern"              	{ECHO;printf("\n");
+"extern"              	{debug();
 			yylval.boolean = true;
 			return EXTERN; }
-"return"               {ECHO;printf("\n");
+"return"               {debug();
 			yylval.boolean = true;
 			return RETURN; }
 			
-"case"                 {ECHO;printf("\n");
+"case"                 {debug();
 			yylval.selection_nom = strdup(yytext); 
 			return CASE; }
-"default"              {ECHO;printf("\n");
+"default"              {debug();
 			yylval.selection_nom = strdup(yytext);
 			return DEFAULT; }
-"if"                   {ECHO;printf("\n");
+"if"                   {debug();
 			yylval.selection_nom = strdup(yytext);
 			return IF; }
-"switch"               {ECHO;printf("\n");
+"switch"               {debug();
 			yylval.selection_nom = strdup(yytext);
 			return SWITCH; }
 			
-"for"                  {ECHO;printf("\n");
+"for"                  {debug();
 			yylval.boolean = true;
 			return FOR; }
-"while"                {ECHO;printf("\n");
+"while"                {debug();
 			yylval.boolean = false;
 			return WHILE; }
 
-"int"                 	{ECHO;printf("\n");
+"int"                	{debug();
 			yylval.type=strdup(yytext); 
 			return INT; }
-"void"                	{ECHO;printf("\n");
+"void"                	{debug();
 			yylval.type=strdup(yytext); 
 			return VOID; }
 
-{L}({L}|{D})*         	{ECHO;printf("\n");
+{L}({L}|{D})*         	{debug();
 			yylval.identificateur = strdup(yytext);
 			return IDENTIFICATEUR; }
 
-{D}+                  	{ECHO;printf("\n");
+{D}+                  	{debug();
 			yylval.constante = atoi(yytext);
 			return CONSTANTE; }
 
-"/"                   	{ECHO;printf("\n");
+"/"                   	{debug();
 			yylval.binary_op = strdup(yytext);
             		return DIV; }
-"+"                    {ECHO;printf("\n");
+"+"                    {debug();
 			yylval.binary_op = strdup(yytext);
              		return PLUS; }
-"-"                    {ECHO;printf("\n");
+"-"                    {debug();
 			yylval.binary_op = strdup(yytext);
              		return MOINS; }
-"*"                    {ECHO;printf("\n");
+"*"                    {debug();
 			yylval.binary_op = strdup(yytext);
              		return MUL; }
-">"                    {ECHO;printf("\n");
+">"                    {debug();
 			yylval.binary_op = strdup(yytext);
              		return GT; }
-"<"                    {ECHO;printf("\n");
+"<"                    {debug();
 			yylval.binary_op = strdup(yytext);
              		return LT; }
-"&"                    {ECHO;printf("\n");
+"&"                    {debug();
 			yylval.binary_op = strdup(yytext);
              		return BAND; }
-"|"                    {ECHO;printf("\n");
+"|"                    {debug();
 			yylval.binary_op = strdup(yytext);
              		return BOR; }
-">>"                   {ECHO;printf("\n");
+">>"                   {debug();
 			yylval.binary_op = strdup(yytext);
              		return RSHIFT; }
-"<<"                   {ECHO;printf("\n");
+"<<"                  	{debug();
 			yylval.binary_op = strdup(yytext);
              		return LSHIFT; }
              		
-"&&"                   {ECHO;printf("\n");
+"&&"                   {debug();
 			yylval.binary_rel = strdup(yytext);
              		return LAND; }
-"||"                   {ECHO;printf("\n");
+"||"                   {debug();
 			yylval.binary_rel = strdup(yytext);
              		return LOR; }
-"!"                    {ECHO;printf("\n");
+"!"                    {debug();
 			yylval.binary_rel = strdup(yytext);
 			return NOT; }
              		
-"<="                   {ECHO;printf("\n");
+"<="                   {debug();
 			yylval.binary_comp = strdup(yytext);
              		return LEQ; }
-">="                   {ECHO;printf("\n");
+">="                  	{debug();
 			yylval.binary_comp = strdup(yytext);
              		return GEQ; }
-"=="                   {ECHO;printf("\n");
+"=="                   {debug();
 			yylval.binary_comp = strdup(yytext);
              		return EQ; }
-"!="                   {ECHO;printf("\n");
+"!="                  	{debug();
 			yylval.binary_comp = strdup(yytext);
              		return NEQ; }
 
 [ \t\v\n\f]            {}
-.                      {ECHO;printf("\n");
+.                      {debug();
 			return yytext[0]; }
 
 %%
+
+void debug(){
+	if(global_debug){
+	ECHO;
+	printf("\n");
+	}
+}
+
 
