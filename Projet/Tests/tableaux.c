@@ -1,3 +1,4 @@
+/* TEST TABLEAUX MINIC */
 
 int tab[300];
 

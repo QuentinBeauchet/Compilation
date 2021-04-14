@@ -146,7 +146,7 @@ struct programme_t {
 	struct liste_fonctions_t liste_fonctions;
 };
 
-/* Declarations fonctions */
+/* Declarations fonctions Print */
 
 void print_programme(struct programme_t p);
 void print_liste_declarations(int n,struct liste_declarations_t* tab);
@@ -171,4 +171,7 @@ void print_liste_expressions(int n,struct liste_expressions_t* tab);
 void print_expression(int n,struct expression_t* e);
 void print_condition(int n,struct condition_t* c);
 
+/* Declarations fonctions Dot */
+void dot_generation(struct programme_t programme,char* file_name);
+void dot_programme(struct programme_t* programme);
 

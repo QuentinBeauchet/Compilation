@@ -281,7 +281,7 @@ void yyerror (const char *s){
   	fprintf (stderr, "ERREUR: %s\n", s);
 }
 
-int main(){
+int main(int argc, char *argv[]){
 	if(global_debug){
 		printf("-----------------------------------------------------------------LEX-----------------------------------------------------------------\n");
 	}
@@ -290,4 +290,5 @@ int main(){
 		printf("-------------------------------------------------------VERIFICATION DES STRUCTS-------------------------------------------------------\n");
 		print_programme(global_programme);
 	}
+	dot_generation(global_programme,argv[1]);
 }

@@ -3,6 +3,8 @@
 #include <string.h>
 #include "types.h"
 
+FILE* fichier;
+
 /* Print */
 void print_tab(int n){
 	for (int i = 0; i < n; ++i){
@@ -504,6 +506,24 @@ void append_liste_affectations(struct liste_affectations_t* tab, struct affectat
 void append_liste_fonctions(struct liste_fonctions_t* tab, struct fonction_t f){
 	tab->liste[tab->size] = f;
 	tab->size=tab->size+1;
+}
+
+/* Dot */
+
+void dot_generation(struct programme_t programme,char* file_name){
+	fichier=fopen(file_name, "a");
+	fprintf(fichier,"string");
+	//creation fichier dot
+	//ouverture fichier dot
+	//creation graph
+	dot_programme(&programme);
+	fclose(fichier);
+}
+
+void dot_programme(struct programme_t* programme){
+	//affichage programme
+	//dot_liste_declarations(programme->liste_declarations);
+	//dot_liste_fonctions(&programme->liste_fonctions);
 }
 
 

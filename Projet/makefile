@@ -19,14 +19,10 @@ compil: lex.yy.c y.tab.c
 	
 parse: try
 	@mkdir -p Résultats;
-	@for file in ./Tests/*.c; do \
-		echo "Fichier: " $${file}; \
-		./try < $${file}; \
-	done
+	@$(foreach f, $(wildcard ./Tests/*.c), \
+		echo "Fichier: " $f; \
+		./try $(addsuffix $(addsuffix .dot,$(notdir $(basename $f))),Résultats/) < $f;)
 		
 clear: y.tab.h y.tab.c lex.yy.c try
 	@rm y.tab.h y.tab.c lex.yy.c try
-	$(info --------------------------------------> Compilation reussie.)
-
-
-
+	@echo Compilation reussie.
