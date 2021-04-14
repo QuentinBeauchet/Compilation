@@ -1,6 +1,7 @@
 all: main
 
 debug: print all
+	@sed -i 's/true/false/'g types.h
 
 print:
 	@sed -i 's/false/true/'g types.h
@@ -25,7 +26,6 @@ parse: try
 		
 clear: y.tab.h y.tab.c lex.yy.c try
 	@rm y.tab.h y.tab.c lex.yy.c try
-	@sed -i 's/true/false/'g types.h
 	$(info --------------------------------------> Compilation reussie.)
 
 
