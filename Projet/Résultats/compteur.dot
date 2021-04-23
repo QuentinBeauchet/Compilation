@@ -1,0 +1,38 @@
+digraph diagram1 {
+//programme
+node_1 [label="main,int" shape=invtrapezium color=blue];//fonction
+ node_2 [label="FOR" ];//FOR
+node_3 [label=":=" ];//affectation
+node_4 [label="i" ];//				affec
+node_5 [label="0" ];//expression3
+node_3 -> node_4
+node_3 -> node_5
+node_6 [label="<"];//cond3
+node_7 [label="i" ];//expression4
+node_8 [label="1000" ];//expression3
+node_6 -> node_7
+node_6 -> node_8
+node_9 [label=":=" ];//affectation
+node_10 [label="i" ];//				affec
+node_11 [label="+" ];//expression1
+node_12 [label="i" ];//expression4
+node_13 [label="1" ];//expression3
+node_11 -> node_12
+node_11 -> node_13
+node_9 -> node_10
+node_9 -> node_11
+node_14 [label="BLOC" shape=ellipse];//bloc
+node_15 [label="printd" shape=septagon];//appel
+node_16 [label="i" ];//expression4
+node_15 -> node_16
+node_14 -> node_15
+node_2 -> node_3
+node_2 -> node_6
+node_2 -> node_9
+node_2 -> node_14
+node_1 -> node_2
+node_20 [label="RETURN" shape=trapezium color=blue];//RETURN
+node_21 [label="0" ];//expression3
+node_20 -> node_21
+node_1 -> node_20
+}

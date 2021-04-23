@@ -1,0 +1,100 @@
+digraph diagram1 {
+//programme
+node_1 [label="main,int" shape=invtrapezium color=blue];//fonction
+ node_2 [label=":=" ];//affectation
+node_3 [label="i" ];//				affec
+node_4 [label="0" ];//expression3
+node_2 -> node_3
+node_2 -> node_4
+node_1 -> node_2
+node_6 [label="WHILE" ];//WHILE
+node_7 [label="<"];//cond3
+node_8 [label="i" ];//expression4
+node_9 [label="10" ];//expression3
+node_7 -> node_8
+node_7 -> node_9
+node_10 [label="BLOC" shape=ellipse];//bloc
+node_11 [label="printd" shape=septagon];//appel
+node_12 [label="i" ];//expression4
+node_11 -> node_12
+node_10 -> node_11
+node_14 [label=":=" ];//affectation
+node_15 [label="i" ];//				affec
+node_16 [label="+" ];//expression1
+node_17 [label="i" ];//expression4
+node_18 [label="2" ];//expression3
+node_16 -> node_17
+node_16 -> node_18
+node_14 -> node_15
+node_14 -> node_16
+node_10 -> node_14
+node_6 -> node_7
+node_6 -> node_10
+node_1 -> node_6
+node_22 [label="FOR" ];//FOR
+node_23 [label=":=" ];//affectation
+node_24 [label="i" ];//				affec
+node_25 [label="-" ];//expression3
+node_26 [label="10" ];//expression3
+node_25 -> node_26
+node_23 -> node_24
+node_23 -> node_25
+node_27 [label="<="];//cond3
+node_28 [label="i" ];//expression4
+node_29 [label="10" ];//expression3
+node_27 -> node_28
+node_27 -> node_29
+node_30 [label=":=" ];//affectation
+node_31 [label="i" ];//				affec
+node_32 [label="+" ];//expression1
+node_33 [label="i" ];//expression4
+node_34 [label="1" ];//expression3
+node_32 -> node_33
+node_32 -> node_34
+node_30 -> node_31
+node_30 -> node_32
+node_35 [label="printd" shape=septagon];//appel
+node_36 [label="i" ];//expression4
+node_35 -> node_36
+node_22 -> node_23
+node_22 -> node_27
+node_22 -> node_30
+node_22 -> node_35
+node_1 -> node_22
+node_39 [label=":=" ];//affectation
+node_40 [label="i" ];//				affec
+node_41 [label="0" ];//expression3
+node_39 -> node_40
+node_39 -> node_41
+node_1 -> node_39
+node_43 [label="WHILE" ];//WHILE
+node_44 [label=">="];//cond3
+node_45 [label="i" ];//expression4
+node_46 [label="-" ];//expression3
+node_47 [label="20" ];//expression3
+node_46 -> node_47
+node_44 -> node_45
+node_44 -> node_46
+node_48 [label="BLOC" shape=ellipse];//bloc
+node_49 [label="printd" shape=septagon];//appel
+node_50 [label="i" ];//expression4
+node_49 -> node_50
+node_48 -> node_49
+node_52 [label=":=" ];//affectation
+node_53 [label="i" ];//				affec
+node_54 [label="-" ];//expression1
+node_55 [label="i" ];//expression4
+node_56 [label="1" ];//expression3
+node_54 -> node_55
+node_54 -> node_56
+node_52 -> node_53
+node_52 -> node_54
+node_48 -> node_52
+node_43 -> node_44
+node_43 -> node_48
+node_1 -> node_43
+node_60 [label="RETURN" shape=trapezium color=blue];//RETURN
+node_61 [label="0" ];//expression3
+node_60 -> node_61
+node_1 -> node_60
+}

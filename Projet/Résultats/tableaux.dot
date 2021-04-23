@@ -1,0 +1,22 @@
+digraph diagram1 {
+//programme
+node_1 [label="main,int" shape=invtrapezium color=blue];//fonction
+ node_2 [label="TAB"];//tableau
+node_3 [label="tab"];//tableau
+node_2 -> node_3//test
+node_4 [label="3" ];//expression3
+node_4 [shape=triangle];
+node_5 [label="tab" ];//expression4
+node_2 -> node_4
+node_4 -> node_5
+node_1 -> node_2
+node_7 [label="TAB"];//tableau
+node_8 [label="tab"];//tableau
+node_7 -> node_8//test
+node_9 [label="400" ];//expression3
+node_9 [shape=triangle];
+node_10 [label="tab" ];//expression4
+node_7 -> node_9
+node_9 -> node_10
+node_1 -> node_7
+}
