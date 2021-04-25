@@ -1,0 +1,46 @@
+digraph diagram1 {
+//programme
+node_1 [label="main,int" shape=invtrapezium color=blue];//fonction
+ node_2 [label=":=" ];//affectation
+node_3 [label="j" ];//				affec
+node_4 [label="123" ];//expression3
+node_2 -> node_3
+node_2 -> node_4
+node_1 -> node_2
+node_6 [label="printd" shape=septagon];//appel
+node_7 [label="-" ];//expression3
+node_8 [label="j" ];//expression4
+node_7 -> node_8
+node_6 -> node_7
+node_1 -> node_6
+node_10 [label="printd" shape=septagon];//appel
+node_11 [label="-" ];//expression3
+node_12 [label="123" ];//expression3
+node_11 -> node_12
+node_10 -> node_11
+node_1 -> node_10
+node_14 [label="printd" shape=septagon];//appel
+node_15 [label="-" ];//expression3
+node_16 [label="+" ];//expression1
+node_17 [label="123" ];//expression3
+node_18 [label="0" ];//expression3
+node_16 -> node_17
+node_16 -> node_18
+node_15 -> node_16
+node_14 -> node_15
+node_1 -> node_14
+node_20 [label="printd" shape=septagon];//appel
+node_21 [label="-" ];//expression3
+node_22 [label="+" ];//expression1
+node_23 [label="j" ];//expression4
+node_24 [label="0" ];//expression3
+node_22 -> node_23
+node_22 -> node_24
+node_21 -> node_22
+node_20 -> node_21
+node_1 -> node_20
+node_26 [label="RETURN" shape=trapezium color=blue];//RETURN
+node_27 [label="0" ];//expression3
+node_26 -> node_27
+node_1 -> node_26
+}

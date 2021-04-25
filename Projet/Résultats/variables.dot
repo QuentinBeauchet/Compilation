@@ -1,0 +1,16 @@
+digraph diagram1 {
+//programme
+node_1 [label="main,int" shape=invtrapezium color=blue];//fonction
+ node_2 [label=":=" ];//affectation
+node_3 [label="a" ];//				affec
+node_4 [label="0" ];//expression3
+node_2 -> node_3
+node_2 -> node_4
+node_1 -> node_2
+node_6 [label=":=" ];//affectation
+node_7 [label="b" ];//				affec
+node_8 [label="1" ];//expression3
+node_6 -> node_7
+node_6 -> node_8
+node_1 -> node_6
+}

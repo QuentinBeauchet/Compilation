@@ -1,6 +1,5 @@
 D                       [0-9]
 L                       [a-zA-Z_]
-H                       [a-fA-F0-9]
 
 %{
 #include "types.h"
@@ -81,24 +80,18 @@ void debug();
 "*"                    {debug();
 			yylval.binary_op = strdup(yytext);
              		return MUL; }
-">"                    {debug();
-			yylval.binary_op = strdup(yytext);
-             		return GT; }
-"<"                    {debug();
-			yylval.binary_op = strdup(yytext);
-             		return LT; }
-"&"                    {debug();
-			yylval.binary_op = strdup(yytext);
-             		return BAND; }
-"|"                    {debug();
-			yylval.binary_op = strdup(yytext);
-             		return BOR; }
 ">>"                   {debug();
 			yylval.binary_op = strdup(yytext);
              		return RSHIFT; }
 "<<"                  	{debug();
 			yylval.binary_op = strdup(yytext);
-             		return LSHIFT; }
+             		return LSHIFT; }   
+"&"                    {debug();
+			yylval.binary_op = strdup(yytext);
+             		return BAND; }
+"|"                    {debug();
+			yylval.binary_op = strdup(yytext);
+             		return BOR; }          
              		
 "&&"                   {debug();
 			yylval.binary_rel = strdup(yytext);
@@ -110,6 +103,12 @@ void debug();
 			yylval.binary_rel = strdup(yytext);
 			return NOT; }
              		
+">"                    {debug();
+			yylval.binary_comp = strdup(yytext);
+             		return GT; }
+"<"                    {debug();
+			yylval.binary_comp = strdup(yytext);
+             		return LT; }		
 "<="                   {debug();
 			yylval.binary_comp = strdup(yytext);
              		return LEQ; }

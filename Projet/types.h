@@ -174,4 +174,14 @@ void print_condition(int n,struct condition_t* c);
 /* Declarations fonctions Dot */
 void dot_generation(struct programme_t programme,char* file_name);
 void dot_programme(struct programme_t* programme);
-
+void dot_liste_fonctions(struct liste_fonctions_t liste_fonctions);
+void dot_fonction(struct fonction_t fonction);
+int dot_instruction(struct instruction_t instruction);
+int dot_bloc(struct bloc_t b); 
+int dot_appel(struct appel_t appel);
+int dot_expression (struct expression_t e);
+int dot_selection(struct selection_t s);
+int dot_condition(struct condition_t cond);
+int dot_saut (struct saut_t saut);
+int dot_iteration (struct iteration_t i);
+int dot_affectation (struct affectation_t affectation);

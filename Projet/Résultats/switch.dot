@@ -1,0 +1,58 @@
+digraph diagram1 {
+//programme
+node_1 [label="main,int" shape=invtrapezium color=blue];//fonction
+ node_2 [label=":=" ];//affectation
+node_3 [label="i" ];//				affec
+node_4 [label="3" ];//expression3
+node_2 -> node_3
+node_2 -> node_4
+node_1 -> node_2
+node_6 [label="SWITCH"];//SC2
+node_7 [label="i" ];//expression4
+node_6 -> node_7
+node_8 [label="0" shape=triangle];//SC3
+node_9 [label="printd" shape=septagon];//appel
+node_10 [label="0" ];//expression3
+node_9 -> node_10
+node_8 -> node_9
+node_6 -> node_8
+node_13 [label="BREAK" shape=square];//BREAK
+node_10 -> node_13
+node_15 [label="1" shape=triangle];//SC3
+node_16 [label="printd" shape=septagon];//appel
+node_17 [label="1" ];//expression3
+node_16 -> node_17
+node_15 -> node_16
+node_6 -> node_15
+node_20 [label="BREAK" shape=square];//BREAK
+node_17 -> node_20
+node_22 [label="2" shape=triangle];//SC3
+node_23 [label="printd" shape=septagon];//appel
+node_24 [label="2" ];//expression3
+node_23 -> node_24
+node_22 -> node_23
+node_6 -> node_22
+node_27 [label="BREAK" shape=square];//BREAK
+node_24 -> node_27
+node_29 [label="3" shape=triangle];//SC3
+node_30 [label="printd" shape=septagon];//appel
+node_31 [label="3" ];//expression3
+node_30 -> node_31
+node_29 -> node_30
+node_6 -> node_29
+node_34 [label="4" shape=triangle];//SC3
+node_35 [label="printd" shape=septagon];//appel
+node_36 [label="4" ];//expression3
+node_35 -> node_36
+node_34 -> node_35
+node_6 -> node_34
+node_39 [label="DEFAULT" shape=triangle];//SC4
+node_40 [label="printd" shape=septagon];//appel
+node_41 [label="-" ];//expression3
+node_42 [label="1" ];//expression3
+node_41 -> node_42
+node_40 -> node_41
+node_39 -> node_40
+node_6 -> node_39
+node_1 -> node_6
+}

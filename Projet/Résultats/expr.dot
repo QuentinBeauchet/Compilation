@@ -1,0 +1,76 @@
+digraph diagram1 {
+//programme
+node_1 [label="main,int" shape=invtrapezium color=blue];//fonction
+ node_2 [label=":=" ];//affectation
+node_3 [label="i" ];//				affec
+node_4 [label="45000" ];//expression3
+node_2 -> node_3
+node_2 -> node_4
+node_1 -> node_2
+node_6 [label=":=" ];//affectation
+node_7 [label="j" ];//				affec
+node_8 [label="-" ];//expression3
+node_9 [label="123" ];//expression3
+node_8 -> node_9
+node_6 -> node_7
+node_6 -> node_8
+node_1 -> node_6
+node_11 [label=":=" ];//affectation
+node_12 [label="k" ];//				affec
+node_13 [label="43" ];//expression3
+node_11 -> node_12
+node_11 -> node_13
+node_1 -> node_11
+node_15 [label="printd" shape=septagon];//appel
+node_16 [label="/" ];//expression1
+node_17 [label="-" ];//expression1
+node_18 [label="+" ];//expression1
+node_19 [label="/" ];//expression1
+node_20 [label="*" ];//expression1
+node_21 [label="+" ];//expression1
+node_22 [label="i" ];//expression4
+node_23 [label="j" ];//expression4
+node_21 -> node_22
+node_21 -> node_23
+node_24 [label="k" ];//expression4
+node_20 -> node_21
+node_20 -> node_24
+node_25 [label="100" ];//expression3
+node_19 -> node_20
+node_19 -> node_25
+node_26 [label="*" ];//expression1
+node_27 [label="*" ];//expression1
+node_28 [label="j" ];//expression4
+node_29 [label="k" ];//expression4
+node_27 -> node_28
+node_27 -> node_29
+node_30 [label="i" ];//expression4
+node_26 -> node_27
+node_26 -> node_30
+node_18 -> node_19
+node_18 -> node_26
+node_31 [label="<<" ];//expression1
+node_32 [label="j" ];//expression4
+node_33 [label="k" ];//expression4
+node_31 -> node_32
+node_31 -> node_33
+node_17 -> node_18
+node_17 -> node_31
+node_34 [label="-" ];//expression1
+node_35 [label="k" ];//expression4
+node_36 [label=">>" ];//expression1
+node_37 [label="j" ];//expression4
+node_38 [label="2" ];//expression3
+node_36 -> node_37
+node_36 -> node_38
+node_34 -> node_35
+node_34 -> node_36
+node_16 -> node_17
+node_16 -> node_34
+node_15 -> node_16
+node_1 -> node_15
+node_40 [label="RETURN" shape=trapezium color=blue];//RETURN
+node_41 [label="0" ];//expression3
+node_40 -> node_41
+node_1 -> node_40
+}
