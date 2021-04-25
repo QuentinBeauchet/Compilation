@@ -146,6 +146,20 @@ struct programme_t {
 	struct liste_fonctions_t liste_fonctions;
 };
 
+/* Environement */
+
+union Value {
+	struct fonction_t fonction;
+	struct variable_t variable;
+	int get;
+};
+
+struct Env {
+	union Value liste_value[50];
+	char* liste_symbol[50];
+	int size;
+};
+
 /* Declarations fonctions Print */
 
 void print_programme(struct programme_t p);

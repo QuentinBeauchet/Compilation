@@ -130,8 +130,8 @@ void debug();
 
 void debug(){
 	if(global_debug){
-	ECHO;
-	printf("\n");
+		ECHO;
+		printf("\n");
 	}
 }
 
