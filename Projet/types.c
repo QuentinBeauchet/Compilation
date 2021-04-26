@@ -518,13 +518,13 @@ struct expression_t make_expr(struct expression_t e1, char* binary_op, struct ex
 	return (struct expression_t){.binary_op = binary_op, .liste_expressions = copyOf_liste_expressions(&tab), .type_expression = 1};
 }
 
-void extend_env(struct Env* env, char* symbol, union Value value){
+void extend_env(struct Env* env, char* symbol, struct Value value){
 	env->liste_symbol[env->size] = symbol;
 	env->liste_value[env->size] = value;
 	env->size=env->size+1;
 }
 
-union Value lookup(struct Env* env, char* symbol){
+struct Value lookup(struct Env* env, char* symbol){
 	for(int i = env->size-1; i >= 0; --i){
     		if(env->liste_symbol[i]==symbol){
     			return env->liste_value[i];

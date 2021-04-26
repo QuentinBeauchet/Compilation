@@ -148,14 +148,16 @@ struct programme_t {
 
 /* Environement */
 
-union Value {
-	struct fonction_t fonction;
-	struct variable_t variable;
-	int get;
+struct Value {
+	union Exp {
+		struct fonction_t fonction;
+		struct variable_t variable;
+	}exp;
+	int type;
 };
 
 struct Env {
-	union Value liste_value[50];
+	struct Value liste_value[50];
 	char* liste_symbol[50];
 	int size;
 };
