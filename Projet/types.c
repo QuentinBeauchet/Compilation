@@ -609,35 +609,16 @@ int dot_instruction(instruction_t instruction){
 	index_graph = index_graph+1;
 	return myIndex;
 }
-int dot_affectation (affectation_t affectation){
+int dot_affectation (struct affectation_t affectation){
 	int myIndex = index_graph;	
 	index_graph= index_graph+1;
 	
-	if(affectation.variable.liste_expressions->size == 0){
 		fprintf(fichier,"node_%d [label=\":=\" ];//affectation\n",myIndex);
 		int index_var= index_graph;
-		fprintf(fichier,"node_%d [label=\"%s\" ];//				affec\n",index_var,affectation.variable.identificateur);
-		index_graph= index_graph+1;
+		dot_variable(affectation.variable);
 		int index_expr = dot_expression(affectation.expression);
 		fprintf(fichier,"node_%d -> node_%d\n", myIndex,index_var );
 		fprintf(fichier,"node_%d -> node_%d\n", myIndex,index_expr );
-	}else{
-		
-				int index_tab = index_graph;
-		index_graph= index_graph+1;
-
-		fprintf(fichier,"node_%d [label=\"TAB\"];//tableau\n",myIndex);
-		fprintf(fichier,"node_%d [label=\"%s\"];//tableau\n",index_tab,affectation.variable.identificateur);
-		fprintf(fichier,"node_%d -> node_%d//test\n", myIndex,index_tab );
-		
-		for (int i = 0; i < affectation.variable.liste_expressions->size; ++i){
-			int index_tabi = dot_expression(affectation.variable.liste_expressions->liste[i]);
-			fprintf(fichier ,"node_%d [shape=triangle];\n",index_tabi);
-			int index_expr_tabi = dot_expression(affectation.expression);
-			fprintf(fichier,"node_%d -> node_%d\n", myIndex,index_tabi );
-			fprintf(fichier,"node_%d -> node_%d\n", index_tabi,index_expr_tabi );
-    		}
-  	}
 		
 	return myIndex;
 }
@@ -728,10 +709,10 @@ int dot_expression (expression_t e){
         		index_graph =index_graph +1;
         		fprintf(fichier,"node_%d [label=\"%d\" ];//expression3\n",myIndex,*e.constante);
         		break;
-            	case 4 :
-            		index_graph =index_graph +1;
-            		fprintf(fichier,"node_%d [label=\"%s\" ];//expression4\n",myIndex,e.variable->identificateur);
-            		break;
+            	case 4 :{
+				int index_variable = dot_variable(*e.variable);
+		    	}
+		    	break;
                 case 5 :
                 	index_graph =index_graph +1;
         		fprintf(fichier,"node_%d [label=\"%s\" shape=septagon];//expression5\n",myIndex,e.identificateur);
@@ -826,5 +807,27 @@ int dot_condition(condition_t cond){
             		printf("ERROR:\n");
             	}
             return myIndex;
+}
+int dot_variable(variable_t t){
+	int myIndex = index_graph;
+	index_graph =index_graph +1;
+	
+	if(t.liste_expressions->size == 0){
+		fprintf(fichier,"node_%d [label=\"%s\"];//Identificateur\n",myIndex,t.identificateur);
+	}else{
+		fprintf(fichier,"node_%d [label=\"TAB\"];//Tableau\n",myIndex);
+	
+		fprintf(fichier,"node_%d [label=\"%s\"];//Identificateur\n",index_graph,t.identificateur);
+		fprintf(fichier,"node_%d -> node_%d\n", myIndex,index_graph );
+
+		
+		index_graph =index_graph +1;
+		for (int i = 0; i < t.liste_expressions->size; ++i){
+			int index_list_expr = dot_expression(t.liste_expressions->liste[i]);
+			fprintf(fichier,"node_%d -> node_%d\n", myIndex,index_list_expr );
+		}
+	}
+	
+	return myIndex;
 }
 

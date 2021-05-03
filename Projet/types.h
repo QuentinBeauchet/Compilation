@@ -201,3 +201,4 @@ int dot_condition(condition_t cond);
 int dot_saut (saut_t saut);
 int dot_iteration (iteration_t i);
 int dot_affectation (affectation_t affectation);
+int dot_variable(variable_t t);
