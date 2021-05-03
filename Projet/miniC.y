@@ -7,7 +7,7 @@
 int yylex();
 void yyerror (const char *s);
 
-struct programme_t global_programme;
+programme_t global_programme;
 
 %}
 %token<type> INT VOID
@@ -18,7 +18,6 @@ struct programme_t global_programme;
 %token<binary_rel> NOT LAND LOR
 %token<boolean> EXTERN RETURN BREAK ELSE FOR WHILE
 %token<selection_nom> IF SWITCH CASE DEFAULT
-%token END_OF_FILE
 %left PLUS MOINS
 %left MUL DIV
 %left LSHIFT RSHIFT
@@ -26,7 +25,7 @@ struct programme_t global_programme;
 %left LAND LOR
 %nonassoc THEN
 %nonassoc ELSE
-%left OP
+%nonassoc moins
 %left REL
 %start programme
 %define parse.error verbose
@@ -38,7 +37,6 @@ struct programme_t global_programme;
 %type<liste_declarateurs> liste_declarateurs
 %type<declaration> declaration
 %type<liste_declarations> liste_declarations
-%type<binary_op> binary_op
 %type<binary_rel> binary_rel
 %type<binary_comp> binary_comp
 %type<variable> variable
@@ -48,10 +46,10 @@ struct programme_t global_programme;
 %type<appel> appel
 %type<affectation> affectation
 %type<saut> saut
-%type<bloc> bloc
-%type<selection> selection
-%type<instruction> instruction
-%type<liste_instructions> liste_instructions
+%type<bloc> bloc bloc_in_switch
+%type<selection> selection_out_switch selection_in_switch
+%type<instruction> instruction instruction_in_switch
+%type<liste_instructions> liste_instructions liste_instructions_in_case
 %type<iteration> iteration
 %type<fonction> fonction
 %type<liste_fonctions> liste_fonctions
@@ -67,66 +65,66 @@ struct programme_t global_programme;
 	char* binary_comp;
 	char* selection_nom;
 	
-	struct parm_t parm;
-	struct liste_parms_t liste_parms;
-	struct declarateur_t declarateur;
-	struct liste_declarateurs_t liste_declarateurs;
-	struct declaration_t declaration;
-	struct liste_declarations_t liste_declarations;
-	struct variable_t variable;
-	struct liste_expressions_t liste_expressions;
-	struct expression_t expression;
-	struct condition_t condition;
-	struct appel_t appel;
-	struct affectation_t affectation;
-	struct saut_t saut;
-	struct bloc_t bloc;
-	struct selection_t selection;
-	struct instruction_t instruction;
-	struct liste_instructions_t liste_instructions;
-	struct iteration_t iteration;
-	struct fonction_t fonction;
-	struct liste_fonctions_t liste_fonctions;
-	struct programme_t programme;
+	parm_t parm;
+	liste_parms_t liste_parms;
+	declarateur_t declarateur;
+	liste_declarateurs_t liste_declarateurs;
+	declaration_t declaration;
+	liste_declarations_t liste_declarations;
+	variable_t variable;
+	liste_expressions_t liste_expressions;
+	expression_t expression;
+	condition_t condition;
+	appel_t appel;
+	affectation_t affectation;
+	saut_t saut;
+	bloc_t bloc;
+	selection_t selection;
+	instruction_t instruction;
+	liste_instructions_t liste_instructions;
+	iteration_t iteration;
+	fonction_t fonction;
+	liste_fonctions_t liste_fonctions;
+	programme_t programme;
 }
 
 %%
 programme	:	
-		liste_declarations liste_fonctions 		{$$ = (struct programme_t){.liste_declarations = copyOf_liste_declarations(&$1), .liste_fonctions = $2};
+		liste_declarations liste_fonctions 		{$$ = (programme_t){.liste_declarations = copyOf_liste_declarations(&$1), .liste_fonctions = $2};
 								global_programme=$$;}
 ;
 liste_declarations	:
 		liste_declarations declaration 		{append_liste_declarations(&$1,$2);
 								$$=$1;}
-	|							{$$ = (struct liste_declarations_t){ .size = 0};}	
+	|		 					{$$ = (liste_declarations_t){ .size = 0};}
 ;
 liste_fonctions	:	
 		liste_fonctions fonction 			{append_liste_fonctions(&$1,$2);
 								$$=$1;}
-	|       fonction 					{struct liste_fonctions_t tab = {.size = 0};
+	|       fonction 					{liste_fonctions_t tab = {.size = 0};
 								append_liste_fonctions(&tab,$1);
 								$$=tab;}
 ;
 declaration	:	
-		type liste_declarateurs ';' 			{$$ = (struct declaration_t){ .type = $1, .liste_declarateurs = $2};}
+		type liste_declarateurs ';' 			{$$ = (declaration_t){ .type = $1, .liste_declarateurs = $2};}
 ;
 liste_declarateurs	:	
 		liste_declarateurs ',' declarateur 		{append_liste_declarateurs(&$1,$3);
 								$$ = $1;}
-	|	declarateur 					{struct liste_declarateurs_t tab = {.size = 0};
+	|	declarateur 					{liste_declarateurs_t tab = {.size = 0};
 								append_liste_declarateurs(&tab,$1);
 								$$ = tab;}
 ;
 declarateur	:	
-		IDENTIFICATEUR 				{$$ = (struct declarateur_t){ .identificateur = $1, .liste_constantes = (struct liste_constantes_t){.size = 0}};}
+		IDENTIFICATEUR 				{$$ = (declarateur_t){ .identificateur = $1, .liste_constantes = (liste_constantes_t){.size = 0}};}
 	|	declarateur '[' CONSTANTE ']' 		{append_liste_constantes(&$1.liste_constantes,$3);
 								$$ = $1;}
 	
 ;
 fonction	:	
-		type IDENTIFICATEUR '(' liste_parms ')' '{' liste_declarations liste_instructions '}' 	{$$ = (struct fonction_t){ .liste_parms = $4,
+		type IDENTIFICATEUR '(' liste_parms ')' '{' liste_declarations liste_instructions '}' 	{$$ = (fonction_t){ .liste_parms = $4,
 														.liste_declarations = copyOf_liste_declarations(&$7), .identificateur = $2, .type = 														$1, .liste_instructions = copyOf_liste_instructions(&$8)};}
-	|	EXTERN type IDENTIFICATEUR '(' liste_parms ')' ';'  						{$$ = (struct fonction_t){ .Extern = $1, .liste_parms = $5, 
+	|	EXTERN type IDENTIFICATEUR '(' liste_parms ')' ';'  						{$$ = (fonction_t){ .Extern = $1, .liste_parms = $5,
 														.identificateur = $3, .type = $2};}
 ;
 type	:	
@@ -134,141 +132,144 @@ type	:
 	|	INT							{$$ = $1;}
 ;
 liste_parms	:	
-		parm 							{struct liste_parms_t tab = {.size = 0};
+		liste_parms ',' parm 					{append_liste_parms(&$1,$3);
+									$$ = $1;}
+	|	parm 							{liste_parms_t tab = {.size = 0};
 									append_liste_parms(&tab,$1);
 									$$ = tab;}
-	|	parm ',' liste_parms 					{append_liste_parms(&$3,$1);
-									$$ = $3;}
-	|								{struct liste_parms_t tab = {.size = 0};
-									$$ = tab;}
+	|								{$$ = (liste_parms_t){.size = 0};}
 ;
 parm	:	
-		INT IDENTIFICATEUR 					{$$ = (struct parm_t){ .type = $1, .identificateur = $2};}								
+		INT IDENTIFICATEUR 					{$$ = (parm_t){ .type = $1, .identificateur = $2};}
 ;
 liste_instructions :	
 		liste_instructions instruction 			{append_liste_instructions(&$1,$2);
 									$$ = $1;}
-	|	instruction						{struct liste_instructions_t tab = {.size = 0};
-									append_liste_instructions(&tab,$1);
-									$$ = tab;}
+	|								{$$ = (liste_instructions_t){.size = 0};}
 ;
-instruction	:	
-		iteration 						{$$ = (struct instruction_t){.iteration = copyOf_iteration(&$1)};}
-	|	selection 						{$$ = (struct instruction_t){.selection = copyOf_selection(&$1)};}
-	|	saut 							{$$ = (struct instruction_t){.saut = copyOf_saut(&$1)};}
-	|	affectation ';' 					{$$ = (struct instruction_t){.affectation = copyOf_affectation(&$1)};}
-	|	bloc 							{$$ = (struct instruction_t){.bloc = copyOf_bloc(&$1)};}
-	|	appel 							{$$ = (struct instruction_t){.appel = copyOf_appel(&$1)};}
+liste_instructions_in_case :	
+		liste_instructions_in_case instruction_in_switch 	{append_liste_instructions(&$1,$2);
+									$$ = $1;}
+	|								{$$ = (liste_instructions_t){.size = 0};}
+;
+instruction	:
+		selection_in_switch					{$$ = (instruction_t){.selection = copyOf_selection(&$1)};}
+	|	instruction_in_switch					{$$ = $1;}
+;
+instruction_in_switch	:
+		iteration 						{$$ = (instruction_t){.iteration = copyOf_iteration(&$1)};}
+	|	saut 							{$$ = (instruction_t){.saut = copyOf_saut(&$1)};}
+	|	affectation ';' 					{$$ = (instruction_t){.affectation = copyOf_affectation(&$1)};}
+	|	bloc 							{$$ = (instruction_t){.bloc = copyOf_bloc(&$1)};}
+	|	appel 							{$$ = (instruction_t){.appel = copyOf_appel(&$1)};}
+	|	selection_out_switch					{$$ = (instruction_t){.selection = copyOf_selection(&$1)};}
 ;
 iteration	:	
-		FOR '(' affectation ';' condition ';' affectation ')' instruction	{struct liste_affectations_t tab = {.size = 0};
+		FOR '(' affectation ';' condition ';' affectation ')' instruction	{liste_affectations_t tab = {.size = 0};
 											append_liste_affectations(&tab,$3);
 											append_liste_affectations(&tab,$7);
-											$$ = (struct iteration_t){.For = $1, .condition = copyOf_condition(&$5), .instruction = 
+											$$ = (iteration_t){.For = $1, .condition = copyOf_condition(&$5), .instruction =
 											copyOf_instruction(&$9), .liste_affectations = copyOf_liste_affectations(&tab)};}
-	|	WHILE '(' condition ')' instruction 					{$$ = (struct iteration_t){.For = $1, .condition = copyOf_condition(&$3), .instruction = copyOf_instruction(&$5)};}
+	|	WHILE '(' condition ')' instruction 					{$$ = (iteration_t){.For = $1, .condition = copyOf_condition(&$3), .instruction = copyOf_instruction(&$5)};}
 ;
-selection	:	
-		IF '(' condition ')' instruction %prec THEN		{struct liste_instructions_t tab = {.size = 0};
+selection_out_switch	:	
+		IF '(' condition ')' instruction %prec THEN		{liste_instructions_t tab = {.size = 0};
 									append_liste_instructions(&tab,$5);
-									$$ = (struct selection_t){.type_selection = 0, .selection_nom = $1, .condition = $3, .liste_instructions = 
+									$$ = (selection_t){.type_selection = 0, .selection_nom = $1, .condition = $3, .liste_instructions =
 									copyOf_liste_instructions(&tab)};}
-	|	IF '(' condition ')' instruction ELSE instruction	{struct liste_instructions_t tab = {.size = 0};
+	|	IF '(' condition ')' instruction ELSE instruction	{liste_instructions_t tab = {.size = 0};
 									append_liste_instructions(&tab,$5);
 									append_liste_instructions(&tab,$7);
-									$$ = (struct selection_t){.type_selection = 1, .selection_nom = $1, .condition = $3, .Else = $6, .liste_instructions = 
+									$$ = (selection_t){.type_selection = 1, .selection_nom = $1, .condition = $3, .Else = $6, .liste_instructions =
 									copyOf_liste_instructions(&tab)};}
-	|	SWITCH '(' expression ')' instruction 		{struct liste_instructions_t tab = {.size = 0};
+	|	SWITCH '(' expression ')' instruction 		{liste_instructions_t tab = {.size = 0};
 									append_liste_instructions(&tab,$5);
-									$$ = (struct selection_t){.type_selection = 2, .selection_nom = $1, .expression = $3, .liste_instructions = 
+									$$ = (selection_t){.type_selection = 2, .selection_nom = $1, .expression = $3, .liste_instructions =
 									copyOf_liste_instructions(&tab)};}
-	|	CASE CONSTANTE ':' instruction 			{struct liste_instructions_t tab = {.size = 0};
-									append_liste_instructions(&tab,$4);
-									$$ = (struct selection_t){.type_selection = 3, .selection_nom = $1, .constante = $2, .liste_instructions = 
-									copyOf_liste_instructions(&tab)};}
-	|	DEFAULT ':' instruction 				{struct liste_instructions_t tab = {.size = 0};
-									append_liste_instructions(&tab,$3);
-									$$ = (struct selection_t){.type_selection = 4, .selection_nom = $1, .liste_instructions = copyOf_liste_instructions(&tab)};}
+;
+selection_in_switch	:	
+		CASE CONSTANTE ':' bloc_in_switch 			{$$ = make_selection(3,$1,$4,$2);}
+	|	DEFAULT ':' bloc_in_switch 				{$$ = make_selection(4,$1,$3,0);}
 ;
 saut	:	
-		BREAK ';' 						{$$ = (struct saut_t){.Return = $1};}
-	|	RETURN ';' 						{$$ = (struct saut_t){.Return = $1};}
-	|	RETURN expression ';' 					{$$ = (struct saut_t){.Return = $1, .expression = copyOf_expression(&$2)};}
+		BREAK ';' 						{$$ = (saut_t){.Return = $1};}
+	|	RETURN ';' 						{$$ = (saut_t){.Return = $1};}
+	|	RETURN expression ';' 					{$$ = (saut_t){.Return = $1, .expression = copyOf_expression(&$2)};}
 ;
 affectation	:	
-		variable '=' expression 				{$$ = (struct affectation_t){.variable = $1, .expression = $3};}
+		variable '=' expression 				{$$ = (affectation_t){.variable = $1, .expression = $3};}
 ;
 bloc	:	
-		'{' liste_declarations liste_instructions '}' 	{$$ = (struct bloc_t){.liste_declarations = $2 , .liste_instructions = $3};}
+		'{' liste_declarations liste_instructions '}' 	{$$ = (bloc_t){.liste_declarations = $2 , .liste_instructions = $3};}
+;
+bloc_in_switch	:
+		liste_declarations liste_instructions_in_case		{$$ = (bloc_t){.liste_declarations = $1 , .liste_instructions = $2};}
 ;
 appel	:	
-		IDENTIFICATEUR '(' liste_expressions ')' ';'		{$$ = (struct appel_t){.identificateur = $1 , .liste_expressions = *copyOf_liste_expressions(&$3)};}
+		IDENTIFICATEUR '(' liste_expressions ')' ';'		{$$ = (appel_t){.identificateur = $1 , .liste_expressions = *copyOf_liste_expressions(&$3)};}
 ;
 variable	:	
-		IDENTIFICATEUR 					{$$ = (struct variable_t){.identificateur = $1, .liste_expressions = 
-									copyOf_liste_expressions(&(struct liste_expressions_t){.size = 0})};}		
+		IDENTIFICATEUR 					{$$ = (variable_t){.identificateur = $1, .liste_expressions =
+									copyOf_liste_expressions(&(liste_expressions_t){.size = 0})};}
 	|	variable '[' expression ']' 				{append_liste_expressions($1.liste_expressions,$3);
 									$$ = $1;}
 						
 ;
 expression	:	
-		'(' expression ')' 					{struct liste_expressions_t tab = {.size = 0};
+
+		'(' expression ')' 					{liste_expressions_t tab = {.size = 0};
 									append_liste_expressions(&tab,$2);
 									$2.liste_expressions = copyOf_liste_expressions(&tab);
 									$2.type_expression = 0;
 									$$ = $2;}
-	|	expression binary_op expression %prec OP 		{struct liste_expressions_t tab = {.size = 0};
-									append_liste_expressions(&tab,$1);
-									append_liste_expressions(&tab,$3);
-									$$ = (struct expression_t){.binary_op = $2, .liste_expressions = copyOf_liste_expressions(&tab), .type_expression = 1};}
-	|	MOINS expression 					{struct liste_expressions_t tab = {.size = 0};
+ 	|	expression PLUS expression				{$$ = make_expr($1,$2,$3);}
+	|	expression MOINS expression				{$$ = make_expr($1,$2,$3);}
+	|	expression DIV expression				{$$ = make_expr($1,$2,$3);}
+	|	expression MUL expression				{$$ = make_expr($1,$2,$3);}
+	|	expression RSHIFT expression				{$$ = make_expr($1,$2,$3);}
+	|	expression LSHIFT expression				{$$ = make_expr($1,$2,$3);}
+	|	expression BAND expression				{$$ = make_expr($1,$2,$3);}
+	|	expression BOR expression				{$$ = make_expr($1,$2,$3);}
+	|	MOINS expression %prec moins				{liste_expressions_t tab = {.size = 0};
 									append_liste_expressions(&tab,$2);
-									$$ = (struct expression_t){.binary_op = $1, .liste_expressions = copyOf_liste_expressions(&tab), .type_expression = 2};}
-	|	CONSTANTE 						{$$ = (struct expression_t){.constante = copyOf_constante(&$1), .type_expression = 3};}
-	|	variable 						{$$ = (struct expression_t){.variable = copyOf_variable(&$1), .type_expression = 4};}
-	|	IDENTIFICATEUR '(' liste_expressions ')' 		{$$ = (struct expression_t){.identificateur = $1 , .liste_expressions = copyOf_liste_expressions(&$3), .type_expression = 5};}
+									$$ = (expression_t){.binary_op = $1, .liste_expressions = copyOf_liste_expressions(&tab), .type_expression = 2};}
+	|	CONSTANTE 						{$$ = (expression_t){.constante = copyOf_constante(&$1), .type_expression = 3};}
+	|	variable 						{$$ = (expression_t){.variable = copyOf_variable(&$1), .type_expression = 4};}
+	|	IDENTIFICATEUR '(' liste_expressions ')' 		{$$ = (expression_t){.identificateur = $1 , .liste_expressions = copyOf_liste_expressions(&$3), .type_expression = 5};}
 ;
 liste_expressions	:	
 		liste_expressions ',' expression 			{append_liste_expressions(&$1,$3);
 									$$ = $1;}
-	|	expression						{struct liste_expressions_t tab= {.size = 0};
+	|	expression						{liste_expressions_t tab= {.size = 0};
 									append_liste_expressions(&tab,$1);
 									$$ = tab;}
+	|								{$$ = (liste_expressions_t){.size = 0};}
 ;
 condition	:	
-		NOT '(' condition ')' 					{struct liste_conditions_t tab = {.size = 0};
+		NOT '(' condition ')' 					{liste_conditions_t tab = {.size = 0};
 									append_liste_conditions(&tab,$3);
-									$$ = (struct condition_t){.type_condition = 0, .binary_rel = $1, .liste_conditions = &tab};}
-	|	condition binary_rel condition %prec REL 		{struct liste_conditions_t tab = {.size = 0};
+									$$ = (condition_t){.type_condition = 0, .binary_rel = $1, .liste_conditions = &tab};}
+	|	condition binary_rel condition %prec REL 		{liste_conditions_t tab = {.size = 0};
 									append_liste_conditions(&tab,$1);
 									append_liste_conditions(&tab,$3);
-									$$ = (struct condition_t){.type_condition = 1, .binary_rel = $2, .liste_conditions = &tab};}
-	|	'(' condition ')' 					{struct liste_conditions_t tab = {.size = 0};
+									$$ = (condition_t){.type_condition = 1, .binary_rel = $2, .liste_conditions = &tab};}
+	|	'(' condition ')' 					{liste_conditions_t tab = {.size = 0};
 									append_liste_conditions(&tab,$2);
-									$$ = (struct condition_t){.type_condition = 2, .liste_conditions = &tab};}
-	|	expression binary_comp expression 			{struct liste_expressions_t tab = {.size = 0};
+									$$ = (condition_t){.type_condition = 2, .liste_conditions = &tab};}
+	|	expression binary_comp expression 			{liste_expressions_t tab = {.size = 0};
 									append_liste_expressions(&tab,$1);
 									append_liste_expressions(&tab,$3);
-									$$ = (struct condition_t){.type_condition = 3, .binary_comp = $2, .liste_expressions = 		
+									$$ = (condition_t){.type_condition = 3, .binary_comp = $2, .liste_expressions =
 									copyOf_liste_expressions(&tab)};}
 ;
-binary_op    :    
-        PLUS         							{$$ = $1;}
-    |   MOINS         							{$$ = $1;}
-    |   MUL         							{$$ = $1;}
-    |   DIV         							{$$ = $1;}
-    |   LSHIFT     							{$$ = $1;}
-    |   RSHIFT     							{$$ = $1;}
-    |   BAND         							{$$ = $1;}
-    |   BOR         							{$$ = $1;}
-;
+
 binary_rel    :    
         LAND         							{$$ = $1;}
     |   LOR         							{$$ = $1;}
 ;
-binary_comp    :    
-        LT         							{$$ = $1;}
-    |   GT         							{$$ = $1;}
+binary_comp    :   
+        GT								{$$ = $1;}
+    |   LT								{$$ = $1;}
     |   GEQ         							{$$ = $1;}
     |   LEQ         							{$$ = $1;}
     |   EQ        							{$$ = $1;}
@@ -292,3 +293,4 @@ int main(int argc, char *argv[]){
 	}
 	dot_generation(global_programme,argv[1]);
 }
+
