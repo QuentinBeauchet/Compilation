@@ -779,10 +779,11 @@ int dot_selection(selection_t s){
   			}
                 	break;
         	case 3 :
-        		//TODO quand la liste est vide sa fait segfault
         		fprintf(fichier,"node_%d [label=\"%d\" shape=triangle];//SC3\n",myIndex,s.constante);
-        		int inst_index = dot_instruction(*s.liste_instructions->liste[0]);
-        		fprintf(fichier,"node_%d -> node_%d\n", myIndex,inst_index );
+        		if(s.liste_instructions->size !=0){
+				int inst_index = dot_instruction(*s.liste_instructions->liste[0]);
+				fprintf(fichier,"node_%d -> node_%d\n", myIndex,inst_index );
+        		}
         		break;
         	case 4 :
         		fprintf(fichier,"node_%d [label=\"DEFAULT\" shape=triangle];//SC4\n",myIndex);
