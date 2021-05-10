@@ -4,174 +4,200 @@ static bool global_debug = false;
 
 /* Structures de données */
 
-struct parm_t {
+typedef struct parm_t {
 	char *identificateur;
 	char *type;
-};
+}parm_t;
 
-struct liste_parms_t {
-	struct parm_t liste[20];
+typedef struct liste_parms_t {
+	parm_t liste[20];
 	int size;
-};
+}liste_parms_t;
 
-struct liste_constantes_t {
+typedef struct liste_constantes_t {
 	int liste[20];
 	int size;
-};
+}liste_constantes_t;
 
-struct declarateur_t {
+typedef struct declarateur_t {
 	char* identificateur;
-	struct liste_constantes_t liste_constantes;
-}; 
+	liste_constantes_t liste_constantes;
+}declarateur_t;
 
-struct liste_declarateurs_t {
-	struct declarateur_t liste[20];
+typedef struct liste_declarateurs_t {
+	declarateur_t liste[20];
 	int size;
-};
+}liste_declarateurs_t;
 
-struct declaration_t {
-	struct liste_declarateurs_t liste_declarateurs;
+typedef struct declaration_t {
+	liste_declarateurs_t liste_declarateurs;
 	char* type;
-};
+}declaration_t;
 
-struct liste_declarations_t {
-	struct declaration_t liste[20];
+typedef struct liste_declarations_t {
+	declaration_t liste[20];
 	int size;
-};
+}liste_declarations_t;
 
-struct variable_t {
+typedef struct variable_t {
 	char* identificateur;
 	struct liste_expressions_t* liste_expressions;
-};
+}variable_t;
 
-struct expression_t {
+typedef struct expression_t {
 	int type_expression;
 	char* identificateur;
 	struct liste_expressions_t* liste_expressions;
-	struct variable_t* variable;
+	variable_t* variable;
 	int* constante;
 	char* binary_op;
-};
+}expression_t;
 
-struct liste_expressions_t {
-	struct expression_t liste[20];
+typedef struct liste_expressions_t {
+	expression_t liste[20];
 	int size;
-};
+}liste_expressions_t;
 
-struct affectation_t {
-	struct variable_t variable;
-	struct expression_t expression;
-};
+typedef struct affectation_t {
+	variable_t variable;
+	expression_t expression;
+}affectation_t;
 
-struct liste_affectations_t {
-	struct affectation_t liste[20];
+typedef struct liste_affectations_t {
+	affectation_t liste[20];
 	int size;
-};
+}liste_affectations_t;
 
-struct condition_t {
+typedef struct condition_t {
 	int type_condition;
 	char* binary_rel;
 	char* binary_comp;
 	struct liste_conditions_t* liste_conditions;
-	struct liste_expressions_t* liste_expressions;
-};
+	liste_expressions_t* liste_expressions;
+}condition_t;
 
-struct liste_conditions_t {
-	struct condition_t liste[20];
+typedef struct liste_conditions_t {
+	condition_t liste[20];
 	int size;
-};
+}liste_conditions_t;
 
-struct appel_t {
+typedef struct appel_t {
 	char* identificateur;
-	struct liste_expressions_t liste_expressions;
-};
+	liste_expressions_t liste_expressions;
+}appel_t;
 
-struct saut_t {
+typedef struct saut_t {
 	bool Return;
-	struct expression_t* expression;
-};
+	expression_t* expression;
+}saut_t;
 
-struct selection_t {
+typedef struct selection_t {
 	int type_selection;
 	char* selection_nom; 
 	int constante; 
 	bool Else;
-	struct liste_instructions_t* liste_instructions; 
-	struct condition_t condition; 
-	struct expression_t expression;
-};
-
-struct instruction_t {
-	struct iteration_t* iteration;
-	struct selection_t* selection;
-	struct saut_t* saut;
-	struct affectation_t* affectation;
-	struct bloc_t* bloc;
-	struct appel_t* appel;
-};
-
-struct liste_instructions_t {
-	struct instruction_t* liste[100];
-	int size;
-};
-
-struct bloc_t {
-	struct liste_instructions_t liste_instructions;
-	struct liste_declarations_t liste_declarations;
-};
-
-struct iteration_t {
-	bool For;
-	struct liste_affectations_t* liste_affectations; 
-	struct condition_t* condition; 
-	struct instruction_t* instruction;
-};
-
-struct fonction_t {
-	struct liste_parms_t liste_parms;
-	struct liste_declarations_t* liste_declarations;
 	struct liste_instructions_t* liste_instructions;
+	condition_t condition;
+	expression_t expression;
+}selection_t;
+
+typedef struct instruction_t {
+	struct iteration_t* iteration;
+	selection_t* selection;
+	saut_t* saut;
+	affectation_t* affectation;
+	struct bloc_t* bloc;
+	appel_t* appel;
+}instruction_t;
+
+typedef struct liste_instructions_t {
+	instruction_t* liste[100];
+	int size;
+}liste_instructions_t;
+
+typedef struct bloc_t {
+	liste_instructions_t liste_instructions;
+	liste_declarations_t liste_declarations;
+}bloc_t;
+
+typedef struct iteration_t {
+	bool For;
+	liste_affectations_t* liste_affectations;
+	condition_t* condition;
+	instruction_t* instruction;
+}iteration_t;
+
+typedef struct fonction_t {
+	liste_parms_t liste_parms;
+	bloc_t* bloc;
 	bool Extern;
 	char *identificateur;
 	char *type;
-};
+}fonction_t;
 
-struct liste_fonctions_t {
-	struct fonction_t liste[20];
+typedef struct liste_fonctions_t {
+	fonction_t liste[20];
 	int size;
-};
+}liste_fonctions_t;
 
-struct programme_t {
-	struct liste_declarations_t* liste_declarations;
-	struct liste_fonctions_t liste_fonctions;
-};
+typedef struct programme_t {
+	liste_declarations_t* liste_declarations;
+	liste_fonctions_t liste_fonctions;
+}programme_t;
+
+/* Environement */
+
+typedef struct Value {
+	union Exp {
+		fonction_t fonction;
+		variable_t variable;
+	}exp;
+	int type;
+}Value;
+
+typedef struct Env {
+	Value liste_value[50];
+	char* liste_symbol[50];
+	int size;
+}Env;
 
 /* Declarations fonctions Print */
 
-void print_programme(struct programme_t p);
-void print_liste_declarations(int n,struct liste_declarations_t* tab);
-void print_declaration(int n,struct declaration_t* d);
-void print_liste_declarateurs(int n,struct liste_declarateurs_t tab);
-void print_declarateur(int n,struct declarateur_t d);
-void print_liste_constantes(int n,struct liste_constantes_t tab);
-void print_liste_fonctions(int n,struct liste_fonctions_t tab);
-void print_fonction(int n,struct fonction_t f);
-void print_liste_parms(int n,struct liste_parms_t* tab);
-void print_parm(int n,struct parm_t p);
-void print_liste_instructions(int n,struct liste_instructions_t* tab);
-void print_instruction(int n,struct instruction_t* i);
-void print_iteration(int n,struct iteration_t* i);
-void print_selection(int n,struct selection_t* s);
-void print_saut(int n,struct saut_t* s);
-void print_affectation(int n,struct affectation_t* a);
-void print_bloc(int n,struct bloc_t* b);
-void print_appel(int n,struct appel_t* a);
-void print_variable(int n,struct variable_t* v);
-void print_liste_expressions(int n,struct liste_expressions_t* tab);
-void print_expression(int n,struct expression_t* e);
-void print_condition(int n,struct condition_t* c);
+void print_programme(programme_t p);
+void print_liste_declarations(int n,liste_declarations_t* tab);
+void print_declaration(int n,declaration_t* d);
+void print_liste_declarateurs(int n,liste_declarateurs_t tab);
+void print_declarateur(int n,declarateur_t d);
+void print_liste_constantes(int n,liste_constantes_t tab);
+void print_liste_fonctions(int n,liste_fonctions_t tab);
+void print_fonction(int n,fonction_t f);
+void print_liste_parms(int n,liste_parms_t* tab);
+void print_parm(int n,parm_t p);
+void print_liste_instructions(int n,liste_instructions_t* tab);
+void print_instruction(int n,instruction_t* i);
+void print_iteration(int n,iteration_t* i);
+void print_selection(int n,selection_t* s);
+void print_saut(int n,saut_t* s);
+void print_affectation(int n,affectation_t* a);
+void print_bloc(int n,bloc_t* b);
+void print_appel(int n,appel_t* a);
+void print_variable(int n,variable_t* v);
+void print_liste_expressions(int n,liste_expressions_t* tab);
+void print_expression(int n,expression_t* e);
+void print_condition(int n,condition_t* c);
 
 /* Declarations fonctions Dot */
-void dot_generation(struct programme_t programme,char* file_name);
-void dot_programme(struct programme_t* programme);
-
+void dot_generation(programme_t programme,char* file_name);
+void dot_programme(programme_t* programme, Env env);
+void dot_liste_fonctions(liste_fonctions_t liste_fonctions, Env env);
+void dot_fonction(fonction_t fonction, Env env);
+int dot_instruction(instruction_t instruction, Env env);
+int dot_bloc(bloc_t b, Env env);
+int dot_appel(appel_t appel, Env env);
+int dot_expression (expression_t e, Env env);
+int dot_selection(selection_t s, Env env);
+int dot_condition(condition_t cond, Env env);
+int dot_saut (saut_t saut, Env env);
+int dot_iteration (iteration_t i, Env env);
+int dot_affectation (affectation_t affectation, Env env);
+int dot_variable(variable_t t,Env env);
