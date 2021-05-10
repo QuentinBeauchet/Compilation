@@ -122,8 +122,10 @@ declarateur	:
 	
 ;
 fonction	:	
-		type IDENTIFICATEUR '(' liste_parms ')' bloc 			{$$ = (fonction_t){ .liste_parms = $4, .bloc = copyOf_bloc(&$6), .identificateur = $2, .type = $1};}
-	|	EXTERN type IDENTIFICATEUR '(' liste_parms ')' ';'  		{$$ = (fonction_t){ .Extern = $1, .liste_parms = $5, .identificateur = $3, .type = $2};}
+		type IDENTIFICATEUR '(' liste_parms ')' '{' liste_declarations liste_instructions '}' 	{$$ = (fonction_t){ .liste_parms = $4,
+														.liste_declarations = copyOf_liste_declarations(&$7), .identificateur = $2, .type = 														$1, .liste_instructions = copyOf_liste_instructions(&$8)};}
+	|	EXTERN type IDENTIFICATEUR '(' liste_parms ')' ';'  						{$$ = (fonction_t){ .Extern = $1, .liste_parms = $5,
+														.identificateur = $3, .type = $2};}
 ;
 type	:	
 		VOID 							{$$ = $1;}
@@ -188,8 +190,6 @@ selection_out_switch	:
 selection_in_switch	:	
 		CASE CONSTANTE ':' bloc_in_switch 			{$$ = make_selection(3,$1,$4,$2);}
 	|	DEFAULT ':' bloc_in_switch 				{$$ = make_selection(4,$1,$3,0);}
-	|	CASE CONSTANTE ':' bloc 				{$$ = make_selection(3,$1,$4,$2);}
-	|	DEFAULT ':' bloc 					{$$ = make_selection(4,$1,$3,0);}
 ;
 saut	:	
 		BREAK ';' 						{$$ = (saut_t){.Return = $1};}

@@ -129,7 +129,8 @@ typedef struct iteration_t {
 
 typedef struct fonction_t {
 	liste_parms_t liste_parms;
-	bloc_t* bloc;
+	liste_declarations_t* liste_declarations;
+	liste_instructions_t* liste_instructions;
 	bool Extern;
 	char *identificateur;
 	char *type;
@@ -150,7 +151,7 @@ typedef struct programme_t {
 typedef struct Value {
 	union Exp {
 		fonction_t fonction;
-		variable_t variable;
+		declarateur_t declarateur;
 	}exp;
 	int type;
 }Value;
@@ -188,16 +189,18 @@ void print_condition(int n,condition_t* c);
 
 /* Declarations fonctions Dot */
 void dot_generation(programme_t programme,char* file_name);
-void dot_programme(programme_t* programme, Env env);
-void dot_liste_fonctions(liste_fonctions_t liste_fonctions, Env env);
-void dot_fonction(fonction_t fonction, Env env);
-int dot_instruction(instruction_t instruction, Env env);
-int dot_bloc(bloc_t b, Env env);
-int dot_appel(appel_t appel, Env env);
-int dot_expression (expression_t e, Env env);
-int dot_selection(selection_t s, Env env);
-int dot_condition(condition_t cond, Env env);
-int dot_saut (saut_t saut, Env env);
-int dot_iteration (iteration_t i, Env env);
-int dot_affectation (affectation_t affectation, Env env);
+void dot_programme(programme_t* programme,Env env);
+void dot_liste_fonctions(liste_fonctions_t liste_fonctions,Env env);
+void dot_fonction(fonction_t fonction,Env env);
+int dot_instruction(instruction_t instruction,Env env);
+int dot_bloc(bloc_t b,Env env);
+int dot_appel(appel_t appel,Env env);
+int dot_expression (expression_t e,Env env);
+int dot_selection(selection_t s,Env env);
+int dot_condition(condition_t cond,Env env);
+int dot_saut (saut_t saut,Env env);
+int dot_iteration (iteration_t i,Env env);
+int dot_affectation (affectation_t affectation,Env env);
 int dot_variable(variable_t t,Env env);
+
+void extend_env_liste_declaration (liste_declarations_t l,Env* env);

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "types.h"
-
+char* global_file_name;
 FILE* fichier;
 int index_graph = 1;
 
@@ -319,7 +319,8 @@ void print_fonction(int n,fonction_t f){
 	printf("%s\n",f.identificateur);
 	print_liste_parms(n+1,&f.liste_parms);
 	if(!f.Extern){
-		print_bloc(n+1,f.bloc);
+		print_liste_declarations(n+1,f.liste_declarations);
+		print_liste_instructions(n+1,f.liste_instructions);
 	}
 }
 
@@ -527,6 +528,11 @@ selection_t make_selection(int type_selection, char* selection_nom, bloc_t bloc,
 	}
 }
 
+void error(){
+    remove(global_file_name);
+}
+
+
 void extend_env(Env* env, char* symbol, Value value){
 	env->liste_symbol[env->size] = symbol;
 	env->liste_value[env->size] = value;
@@ -540,71 +546,78 @@ Value lookup(Env* env, char* symbol){
     		}
   	}
   	printf("Erreur: Le symbol %s n'existe pas dans l'environement.\n",symbol);
-  	exit(1);
+  	error();
 }
 
 /* Dot */
 
 void dot_generation(programme_t programme,char* file_name){
-	
+	global_file_name = file_name;
 	fichier=fopen(file_name, "w");
 	fclose(fichier);
 	fichier=fopen(file_name, "a");
 	fprintf(fichier,"digraph diagram1 {\n");
 	fprintf(fichier,"//programme\n");
-	Env env = {.size = 0 };
+	Env env = {.size=0};
 	dot_programme(&programme,env);
 	fprintf(fichier, "}\n");
 	fclose(fichier);
 }
 
-void dot_programme(programme_t* programme, Env env){
-	dot_liste_fonctions(programme->liste_fonctions, env);
+void dot_programme(programme_t* programme,Env env){
+	extend_env_liste_declaration(*programme->liste_declarations,&env);
+	dot_liste_fonctions(programme->liste_fonctions,env);
 }
 
-void dot_liste_fonctions(liste_fonctions_t liste_fonctions, Env env){
+void dot_liste_fonctions(liste_fonctions_t liste_fonctions,Env env){
 	for (int i = 0; i < liste_fonctions.size; ++i){
 		extend_env(&env, liste_fonctions.liste[i].identificateur,(Value){.type=0, .exp=liste_fonctions.liste[i]});
 		if(!liste_fonctions.liste[i].Extern){
     			dot_fonction(liste_fonctions.liste[i],env);
     		}
   	}
+	
 }
 
-void dot_fonction(fonction_t fonction, Env env){
+void dot_fonction(fonction_t fonction,Env env){
 	int myIndex = index_graph;
 	fprintf(fichier,"node_%d [label=\"%s,%s\" shape=invtrapezium color=blue];//fonction\n ",myIndex,fonction.identificateur,fonction.type);
 	index_graph = index_graph+1;
-	int index_instruction = dot_bloc(*fonction.bloc, env);
-	fprintf(fichier,"node_%d -> node_%d\n", myIndex,index_instruction );
+	for (int i = 0; i < fonction.liste_instructions->size; ++i){
+		int index_instruction = dot_instruction(*fonction.liste_instructions->liste[i],env);
+		fprintf(fichier,"node_%d -> node_%d\n", myIndex,index_instruction );
+  	}
+	
+	
+	
 }
 
-int dot_instruction(instruction_t instruction, Env env){
+int dot_instruction(instruction_t instruction,Env env){
 	int myIndex = index_graph;
 	
 	if(instruction.bloc != NULL){
-		int index_bloc = dot_bloc(*instruction.bloc, env);
+		int index_bloc = dot_bloc(*instruction.bloc,env);
 
 	}
 	else if (instruction.appel != NULL){
-		int index_appel = dot_appel(*instruction.appel, env);
+		int index_appel = dot_appel(*instruction.appel,env);
 	}
 	if(instruction.iteration != NULL){
-		int index_iteration = dot_iteration(*instruction.iteration, env);
+		int index_iteration = dot_iteration(*instruction.iteration,env);
 	}
 	else if(instruction.selection != NULL){
-		int index_selection = dot_selection(*instruction.selection, env);
+		int index_selection = dot_selection(*instruction.selection,env);
 	}
 	else if(instruction.saut != NULL){
-		int index_saut = dot_saut(*instruction.saut, env);
+		int index_saut = dot_saut(*instruction.saut,env);
 	}
 	else if(instruction.affectation != NULL){
-		int index_affec  = dot_affectation( *instruction.affectation, env);
+		int index_affec  = dot_affectation( *instruction.affectation,env);
 	}
 	index_graph = index_graph+1;
 	return myIndex;
 }
-int dot_affectation (affectation_t affectation,Env env){
+int dot_affectation (struct affectation_t affectation,Env env){
 	int myIndex = index_graph;	
 	index_graph= index_graph+1;
 	
@@ -617,36 +630,36 @@ int dot_affectation (affectation_t affectation,Env env){
 		
 	return myIndex;
 }
-int dot_iteration (iteration_t i, Env env){
+int dot_iteration (iteration_t i,Env env){
 	int myIndex = index_graph;
 	index_graph =index_graph +1;
 	if(i.For){
 		fprintf(fichier,"node_%d [label=\"FOR\" ];//FOR\n",myIndex);
-		int index_affec_init = dot_affectation(i.liste_affectations->liste[0], env);
-		int index_cond_for = dot_condition(*i.condition, env);
-		int index_affec_post = dot_affectation(i.liste_affectations->liste[1], env);
-		int index_body_for = dot_instruction(*i.instruction, env);
+		int index_affec_init = dot_affectation(i.liste_affectations->liste[0],env);
+		int index_cond_for = dot_condition(*i.condition,env);
+		int index_affec_post = dot_affectation(i.liste_affectations->liste[1],env);
+		int index_body_for = dot_instruction(*i.instruction,env);
 		fprintf(fichier,"node_%d -> node_%d\n", myIndex,index_affec_init );
 		fprintf(fichier,"node_%d -> node_%d\n", myIndex,index_cond_for );
 		fprintf(fichier,"node_%d -> node_%d\n", myIndex,index_affec_post );
 		fprintf(fichier,"node_%d -> node_%d\n", myIndex,index_body_for );
 	}else{
 		fprintf(fichier,"node_%d [label=\"WHILE\" ];//WHILE\n",myIndex);
-		int index_cond_while = dot_condition(*i.condition, env);
-		int index_corps_while = dot_instruction(*i.instruction, env);
+		int index_cond_while = dot_condition(*i.condition,env);
+		int index_corps_while = dot_instruction(*i.instruction,env);
 		fprintf(fichier,"node_%d -> node_%d\n", myIndex,index_cond_while );
 		fprintf(fichier,"node_%d -> node_%d\n", myIndex,index_corps_while );
 	}
 	return myIndex;
 }
-int dot_saut (saut_t saut, Env env){
+int dot_saut (saut_t saut,Env env){
 	int myIndex = index_graph;
 	index_graph =index_graph +1;
 	
 	if(saut.Return){
 		fprintf(fichier,"node_%d [label=\"RETURN\" shape=trapezium color=blue];//RETURN\n",myIndex);
 		if(saut.expression!= NULL){
-			int index_expression = dot_expression(*saut.expression, env);
+			int index_expression = dot_expression(*saut.expression,env);
 			fprintf(fichier,"node_%d -> node_%d\n", myIndex,index_expression );
 		}
 		
@@ -658,46 +671,66 @@ int dot_saut (saut_t saut, Env env){
 	return myIndex;
 }
 
-int dot_bloc (bloc_t b, Env env){
+void extend_env_liste_declaration (liste_declarations_t l,Env* env){
+	for (int i = 0; i < l.size; ++i){
+		for (int j = 0; j < l.liste[i].liste_declarateurs.size; ++j){
+			extend_env(env, l.liste[i].liste_declarateurs.liste[j].identificateur,(Value){.type=1, .exp=l.liste[i].liste_declarateurs.liste[j].identificateur});
+		}
+	}
+	
+}
+
+int dot_bloc (bloc_t b,Env env){
 	int myIndex = index_graph;
 	index_graph =index_graph +1;
+	
+	extend_env_liste_declaration(b.liste_declarations,&env);
 	fprintf(fichier,"node_%d [label=\"BLOC\" shape=ellipse];//bloc\n",myIndex);
 	for (int i = 0; i < b.liste_instructions.size; ++i){
-		int index_instruction = dot_instruction(*b.liste_instructions.liste[i], env);
+		int index_instruction = dot_instruction(*b.liste_instructions.liste[i],env);
 		fprintf(fichier,"node_%d -> node_%d\n", myIndex,index_instruction );
+  	}
+	
+	for(int i = env.size-1; i >= 0; --i){
+    		printf("%s\n",env.liste_symbol[i]);
   	}
 	
 	return myIndex;
 }
-int dot_appel(appel_t appel, Env env){
+int dot_appel(appel_t appel,Env env){
+	fonction_t f = lookup(&env,appel.identificateur).exp.fonction;
+	if(appel.liste_expressions.size != f.liste_parms.size){
+		error();
+	}
+	
 	int myIndex = index_graph;
 	index_graph =index_graph +1;
 	fprintf(fichier,"node_%d [label=\"%s\" shape=septagon];//appel\n",myIndex,appel.identificateur);
 	for (int i = 0; i < appel.liste_expressions.size; ++i){
-		int index_expr = dot_expression(appel.liste_expressions.liste[i], env);
+		int index_expr = dot_expression(appel.liste_expressions.liste[i],env);
 		fprintf(fichier,"node_%d -> node_%d\n", myIndex,index_expr );
   	}
 	
 	return myIndex;
 }
-int dot_expression (expression_t e, Env env){
+int dot_expression (expression_t e,Env env){
 	int myIndex = index_graph;
 	switch(e.type_expression){
 		case 0 :
-            		dot_expression(e.liste_expressions->liste[0], env);
+            		dot_expression(e.liste_expressions->liste[0],env);
             		break;
         	case 1 :
         		index_graph =index_graph +1;
         		fprintf(fichier,"node_%d [label=\"%s\" ];//expression1\n",myIndex,e.binary_op);
-        		int left_op = dot_expression(e.liste_expressions->liste[0], env);
-        		int right_op = dot_expression(e.liste_expressions->liste[1], env);
+        		int left_op = dot_expression(e.liste_expressions->liste[0],env);
+        		int right_op = dot_expression(e.liste_expressions->liste[1],env);
         		fprintf(fichier,"node_%d -> node_%d\n", myIndex,left_op );
         		fprintf(fichier,"node_%d -> node_%d\n", myIndex,right_op );
                 	break;
         	case 2 :
         		index_graph =index_graph +1;
         		fprintf(fichier,"node_%d [label=\"%s\" ];//expression3\n",myIndex,e.binary_op);
-        		int res_op = dot_expression(e.liste_expressions->liste[0], env);
+        		int res_op = dot_expression(e.liste_expressions->liste[0],env);
         		fprintf(fichier,"node_%d -> node_%d\n", myIndex,res_op );
                 	break;
         	case 3 :
@@ -707,11 +740,12 @@ int dot_expression (expression_t e, Env env){
             	case 4 :{
 				int index_variable = dot_variable(*e.variable,env);
 		    	}
+		    	break;
                 case 5 :
                 	index_graph =index_graph +1;
         		fprintf(fichier,"node_%d [label=\"%s\" shape=septagon];//expression5\n",myIndex,e.identificateur);
 			for (int i = 0; i < e.liste_expressions->size; ++i){
-				int index_expr = dot_expression(e.liste_expressions->liste[i], env);
+				int index_expr = dot_expression(e.liste_expressions->liste[i],env);
 				fprintf(fichier,"node_%d -> node_%d\n", myIndex,index_expr );
   			}
         		break;
@@ -722,32 +756,32 @@ int dot_expression (expression_t e, Env env){
 	return myIndex;
 	
 }
-int dot_selection(selection_t s, Env env){
+int dot_selection(selection_t s,Env env){
 	int myIndex = index_graph;
 	index_graph =index_graph +1;
 	switch(s.type_selection){
 		case 0 :
 			fprintf(fichier,"node_%d [label=\"IF\" shape=diamond];//IF0\n",myIndex);
-			int cond_index = dot_condition(s.condition, env);
-			int then_index = dot_instruction(*s.liste_instructions->liste[0], env);
-			fprintf(fichier,"node_%d -> node_%d\n", myIndex,cond_index );
-			fprintf(fichier,"node_%d -> node_%d\n", myIndex,then_index );
+			int cond_index = dot_condition(s.condition,env);
+			int then_index = dot_instruction(*s.liste_instructions->liste[0],env);
+			fprintf(fichier,"node_%d -> node_%d\n", myIndex,cond_index);
+			fprintf(fichier,"node_%d -> node_%d\n", myIndex,then_index);
             		break;
         	case 1 :
         		fprintf(fichier,"node_%d [label=\"IF\" shape=diamond];//IF1\n",myIndex);
-			int cond2_index = dot_condition(s.condition, env);
-			int then2_index = dot_instruction(*s.liste_instructions->liste[0], env);
-			int else2_index = dot_instruction(*s.liste_instructions->liste[1], env);
+			int cond2_index = dot_condition(s.condition,env);
+			int then2_index = dot_instruction(*s.liste_instructions->liste[0],env);
+			int else2_index = dot_instruction(*s.liste_instructions->liste[1],env);
 			fprintf(fichier,"node_%d -> node_%d\n", myIndex,cond2_index );
 			fprintf(fichier,"node_%d -> node_%d\n", myIndex,then2_index );
         		fprintf(fichier,"node_%d -> node_%d\n", myIndex,else2_index );
                 	break;
         	case 2 :
         		fprintf(fichier,"node_%d [label=\"SWITCH\"];//SC2\n",myIndex);
-        		int index_expr_switch = dot_expression(s.expression, env);
+        		int index_expr_switch = dot_expression(s.expression,env);
         		fprintf(fichier,"node_%d -> node_%d\n", myIndex,index_expr_switch );
         		for (int i = 0; i < s.liste_instructions->liste[0]->bloc->liste_instructions.size; ++i){
-				int index_instru = dot_instruction(*s.liste_instructions->liste[0]->bloc->liste_instructions.liste[i], env);
+				int index_instru = dot_instruction(*s.liste_instructions->liste[0]->bloc->liste_instructions.liste[i],env);
 				if(s.liste_instructions->liste[0]->bloc->liste_instructions.liste[i]->saut == NULL)
 				fprintf(fichier,"node_%d -> node_%d\n", myIndex,index_instru );
 				else fprintf(fichier,"node_%d -> node_%d\n", index_instru-3,index_instru );
@@ -755,14 +789,14 @@ int dot_selection(selection_t s, Env env){
                 	break;
         	case 3 :
         		fprintf(fichier,"node_%d [label=\"%d\" shape=triangle];//SC3\n",myIndex,s.constante);
-                	if(s.liste_instructions->size !=0){
-                	int inst_index = dot_instruction(*s.liste_instructions->liste[0], env);
-                		fprintf(fichier,"node_%d -> node_%d\n", myIndex,inst_index );
-                	}
-                	break;
+        		if(s.liste_instructions->size !=0){
+				int inst_index = dot_instruction(*s.liste_instructions->liste[0],env);
+				fprintf(fichier,"node_%d -> node_%d\n", myIndex,inst_index );
+        		}
+        		break;
         	case 4 :
         		fprintf(fichier,"node_%d [label=\"DEFAULT\" shape=triangle];//SC4\n",myIndex);
-        		int inst2_index = dot_instruction(*s.liste_instructions->liste[0], env);
+        		int inst2_index = dot_instruction(*s.liste_instructions->liste[0],env);
         		fprintf(fichier,"node_%d -> node_%d\n", myIndex,inst2_index );
         		break;
             	default :
@@ -771,29 +805,29 @@ int dot_selection(selection_t s, Env env){
             return myIndex;
 }
 
-int dot_condition(condition_t cond, Env env){
+int dot_condition(condition_t cond,Env env){
 	int myIndex = index_graph;
 	index_graph = index_graph +1;
 	switch(cond.type_condition){
 		case 0 :
 			fprintf(fichier,"node_%d [label=\"NOT\"];//cond1\n",myIndex);
-			int cond_index = dot_condition(cond.liste_conditions->liste[0], env);
+			int cond_index = dot_condition(cond.liste_conditions->liste[0],env);
 			fprintf(fichier,"node_%d -> node_%d\n", myIndex,cond_index );
             		break;
         	case 1 :
         		fprintf(fichier,"node_%d [label=\"%s\"];//cond2\n",myIndex,cond.binary_rel);
-        		int left_index = dot_condition(cond.liste_conditions->liste[0], env);
-        		int right_index = dot_condition(cond.liste_conditions->liste[1], env);
+        		int left_index = dot_condition(cond.liste_conditions->liste[0],env);
+        		int right_index = dot_condition(cond.liste_conditions->liste[1],env);
         		fprintf(fichier,"node_%d -> node_%d\n", myIndex,left_index );
         		fprintf(fichier,"node_%d -> node_%d\n", myIndex,right_index );
                 	break;
         	case 2 :
-			dot_condition(cond.liste_conditions->liste[0], env);
+			dot_condition(cond.liste_conditions->liste[0],env);
                 	break;
         	case 3 :
         		fprintf(fichier,"node_%d [label=\"%s\"];//cond3\n",myIndex,cond.binary_comp);
-        		int left2_index = dot_expression(cond.liste_expressions->liste[0], env);
-        		int right2_index = dot_expression(cond.liste_expressions->liste[1], env);
+        		int left2_index = dot_expression(cond.liste_expressions->liste[0],env);
+        		int right2_index = dot_expression(cond.liste_expressions->liste[1],env);
         		fprintf(fichier,"node_%d -> node_%d\n", myIndex,left2_index );
         		fprintf(fichier,"node_%d -> node_%d\n", myIndex,right2_index );
         		break;
@@ -803,9 +837,13 @@ int dot_condition(condition_t cond, Env env){
             return myIndex;
 }
 int dot_variable(variable_t t,Env env){
+	//declarateur_t d = lookup(&env,t.identificateur).exp.declarateur;	
+	//print_declarateur(3,d);
+
 	int myIndex = index_graph;
 	index_graph =index_graph +1;
 	
+
 	if(t.liste_expressions->size == 0){
 		fprintf(fichier,"node_%d [label=\"%s\"];//Identificateur\n",myIndex,t.identificateur);
 	}else{
