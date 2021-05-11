@@ -1,0 +1,34 @@
+digraph diagram1 {
+//programme
+node_1 [label="main,int" shape=invtrapezium color=blue];//fonction
+ node_2 [label="BLOC" shape=ellipse];//bloc
+node_3 [label=":=" ];//affectation
+node_4 [label="TAB"];//Tableau
+node_5 [label="tab"];//Identificateur
+node_4 -> node_5
+node_6 [label="3" ];//expression3
+node_4 -> node_6
+node_7 [label="TAB"];//Tableau
+node_8 [label="tab"];//Identificateur
+node_7 -> node_8
+node_9 [label="200" ];//expression3
+node_7 -> node_9
+node_3 -> node_4
+node_3 -> node_7
+node_2 -> node_3
+node_11 [label=":=" ];//affectation
+node_12 [label="TAB"];//Tableau
+node_13 [label="tab"];//Identificateur
+node_12 -> node_13
+node_14 [label="400" ];//expression3
+node_12 -> node_14
+node_15 [label="TAB"];//Tableau
+node_16 [label="tab"];//Identificateur
+node_15 -> node_16
+node_17 [label="0" ];//expression3
+node_15 -> node_17
+node_11 -> node_12
+node_11 -> node_15
+node_2 -> node_11
+node_1 -> node_2
+}

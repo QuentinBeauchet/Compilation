@@ -1,0 +1,120 @@
+digraph diagram1 {
+//programme
+node_1 [label="main,int" shape=invtrapezium color=blue];//fonction
+ node_2 [label="BLOC" shape=ellipse];//bloc
+node_3 [label=":=" ];//affectation
+node_4 [label="i"];//Identificateur
+node_5 [label="45000" ];//expression3
+node_3 -> node_4
+node_3 -> node_5
+node_2 -> node_3
+node_7 [label=":=" ];//affectation
+node_8 [label="j"];//Identificateur
+node_9 [label="-" ];//expression3
+node_10 [label="123" ];//expression3
+node_9 -> node_10
+node_7 -> node_8
+node_7 -> node_9
+node_2 -> node_7
+node_12 [label="printd" shape=septagon];//appel
+node_13 [label="+" ];//expression1
+node_14 [label="i"];//Identificateur
+node_15 [label="j"];//Identificateur
+node_13 -> node_14
+node_13 -> node_15
+node_12 -> node_13
+node_2 -> node_12
+node_17 [label="printd" shape=septagon];//appel
+node_18 [label="+" ];//expression1
+node_19 [label="45000" ];//expression3
+node_20 [label="j"];//Identificateur
+node_18 -> node_19
+node_18 -> node_20
+node_17 -> node_18
+node_2 -> node_17
+node_22 [label="printd" shape=septagon];//appel
+node_23 [label="+" ];//expression1
+node_24 [label="i"];//Identificateur
+node_25 [label="123" ];//expression3
+node_23 -> node_24
+node_23 -> node_25
+node_22 -> node_23
+node_2 -> node_22
+node_27 [label="printd" shape=septagon];//appel
+node_28 [label="+" ];//expression1
+node_29 [label="45000" ];//expression3
+node_30 [label="123" ];//expression3
+node_28 -> node_29
+node_28 -> node_30
+node_27 -> node_28
+node_2 -> node_27
+node_32 [label="printd" shape=septagon];//appel
+node_33 [label="+" ];//expression1
+node_34 [label="i"];//Identificateur
+node_35 [label="+" ];//expression1
+node_36 [label="j"];//Identificateur
+node_37 [label="0" ];//expression3
+node_35 -> node_36
+node_35 -> node_37
+node_33 -> node_34
+node_33 -> node_35
+node_32 -> node_33
+node_2 -> node_32
+node_39 [label="printd" shape=septagon];//appel
+node_40 [label="+" ];//expression1
+node_41 [label="+" ];//expression1
+node_42 [label="i"];//Identificateur
+node_43 [label="0" ];//expression3
+node_41 -> node_42
+node_41 -> node_43
+node_44 [label="j"];//Identificateur
+node_40 -> node_41
+node_40 -> node_44
+node_39 -> node_40
+node_2 -> node_39
+node_46 [label="printd" shape=septagon];//appel
+node_47 [label="+" ];//expression1
+node_48 [label="+" ];//expression1
+node_49 [label="i"];//Identificateur
+node_50 [label="0" ];//expression3
+node_48 -> node_49
+node_48 -> node_50
+node_51 [label="+" ];//expression1
+node_52 [label="j"];//Identificateur
+node_53 [label="0" ];//expression3
+node_51 -> node_52
+node_51 -> node_53
+node_47 -> node_48
+node_47 -> node_51
+node_46 -> node_47
+node_2 -> node_46
+node_55 [label="printd" shape=septagon];//appel
+node_56 [label="+" ];//expression1
+node_57 [label="+" ];//expression1
+node_58 [label="i"];//Identificateur
+node_59 [label="0" ];//expression3
+node_57 -> node_58
+node_57 -> node_59
+node_60 [label="123" ];//expression3
+node_56 -> node_57
+node_56 -> node_60
+node_55 -> node_56
+node_2 -> node_55
+node_62 [label="printd" shape=septagon];//appel
+node_63 [label="+" ];//expression1
+node_64 [label="45000" ];//expression3
+node_65 [label="+" ];//expression1
+node_66 [label="j"];//Identificateur
+node_67 [label="0" ];//expression3
+node_65 -> node_66
+node_65 -> node_67
+node_63 -> node_64
+node_63 -> node_65
+node_62 -> node_63
+node_2 -> node_62
+node_69 [label="RETURN" shape=trapezium color=blue];//RETURN
+node_70 [label="0" ];//expression3
+node_69 -> node_70
+node_2 -> node_69
+node_1 -> node_2
+}

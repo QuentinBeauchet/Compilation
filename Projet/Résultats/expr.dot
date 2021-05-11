@@ -1,0 +1,78 @@
+digraph diagram1 {
+//programme
+node_1 [label="main,int" shape=invtrapezium color=blue];//fonction
+ node_2 [label="BLOC" shape=ellipse];//bloc
+node_3 [label=":=" ];//affectation
+node_4 [label="i"];//Identificateur
+node_5 [label="45000" ];//expression3
+node_3 -> node_4
+node_3 -> node_5
+node_2 -> node_3
+node_7 [label=":=" ];//affectation
+node_8 [label="j"];//Identificateur
+node_9 [label="-" ];//expression3
+node_10 [label="123" ];//expression3
+node_9 -> node_10
+node_7 -> node_8
+node_7 -> node_9
+node_2 -> node_7
+node_12 [label=":=" ];//affectation
+node_13 [label="k"];//Identificateur
+node_14 [label="43" ];//expression3
+node_12 -> node_13
+node_12 -> node_14
+node_2 -> node_12
+node_16 [label="printd" shape=septagon];//appel
+node_17 [label="/" ];//expression1
+node_18 [label="-" ];//expression1
+node_19 [label="+" ];//expression1
+node_20 [label="/" ];//expression1
+node_21 [label="*" ];//expression1
+node_22 [label="+" ];//expression1
+node_23 [label="i"];//Identificateur
+node_24 [label="j"];//Identificateur
+node_22 -> node_23
+node_22 -> node_24
+node_25 [label="k"];//Identificateur
+node_21 -> node_22
+node_21 -> node_25
+node_26 [label="100" ];//expression3
+node_20 -> node_21
+node_20 -> node_26
+node_27 [label="*" ];//expression1
+node_28 [label="*" ];//expression1
+node_29 [label="j"];//Identificateur
+node_30 [label="k"];//Identificateur
+node_28 -> node_29
+node_28 -> node_30
+node_31 [label="i"];//Identificateur
+node_27 -> node_28
+node_27 -> node_31
+node_19 -> node_20
+node_19 -> node_27
+node_32 [label="<<" ];//expression1
+node_33 [label="j"];//Identificateur
+node_34 [label="k"];//Identificateur
+node_32 -> node_33
+node_32 -> node_34
+node_18 -> node_19
+node_18 -> node_32
+node_35 [label="-" ];//expression1
+node_36 [label="k"];//Identificateur
+node_37 [label=">>" ];//expression1
+node_38 [label="j"];//Identificateur
+node_39 [label="2" ];//expression3
+node_37 -> node_38
+node_37 -> node_39
+node_35 -> node_36
+node_35 -> node_37
+node_17 -> node_18
+node_17 -> node_35
+node_16 -> node_17
+node_2 -> node_16
+node_41 [label="RETURN" shape=trapezium color=blue];//RETURN
+node_42 [label="0" ];//expression3
+node_41 -> node_42
+node_2 -> node_41
+node_1 -> node_2
+}

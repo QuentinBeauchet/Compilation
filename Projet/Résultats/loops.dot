@@ -1,0 +1,102 @@
+digraph diagram1 {
+//programme
+node_1 [label="main,int" shape=invtrapezium color=blue];//fonction
+ node_2 [label="BLOC" shape=ellipse];//bloc
+node_3 [label=":=" ];//affectation
+node_4 [label="i"];//Identificateur
+node_5 [label="0" ];//expression3
+node_3 -> node_4
+node_3 -> node_5
+node_2 -> node_3
+node_7 [label="WHILE" ];//WHILE
+node_8 [label="<"];//cond3
+node_9 [label="i"];//Identificateur
+node_10 [label="10" ];//expression3
+node_8 -> node_9
+node_8 -> node_10
+node_11 [label="BLOC" shape=ellipse];//bloc
+node_12 [label="printd" shape=septagon];//appel
+node_13 [label="i"];//Identificateur
+node_12 -> node_13
+node_11 -> node_12
+node_15 [label=":=" ];//affectation
+node_16 [label="i"];//Identificateur
+node_17 [label="+" ];//expression1
+node_18 [label="i"];//Identificateur
+node_19 [label="2" ];//expression3
+node_17 -> node_18
+node_17 -> node_19
+node_15 -> node_16
+node_15 -> node_17
+node_11 -> node_15
+node_7 -> node_8
+node_7 -> node_11
+node_2 -> node_7
+node_23 [label="FOR" ];//FOR
+node_24 [label=":=" ];//affectation
+node_25 [label="i"];//Identificateur
+node_26 [label="-" ];//expression3
+node_27 [label="10" ];//expression3
+node_26 -> node_27
+node_24 -> node_25
+node_24 -> node_26
+node_28 [label="<="];//cond3
+node_29 [label="i"];//Identificateur
+node_30 [label="10" ];//expression3
+node_28 -> node_29
+node_28 -> node_30
+node_31 [label=":=" ];//affectation
+node_32 [label="i"];//Identificateur
+node_33 [label="+" ];//expression1
+node_34 [label="i"];//Identificateur
+node_35 [label="1" ];//expression3
+node_33 -> node_34
+node_33 -> node_35
+node_31 -> node_32
+node_31 -> node_33
+node_36 [label="printd" shape=septagon];//appel
+node_37 [label="i"];//Identificateur
+node_36 -> node_37
+node_23 -> node_24
+node_23 -> node_28
+node_23 -> node_31
+node_23 -> node_36
+node_2 -> node_23
+node_40 [label=":=" ];//affectation
+node_41 [label="i"];//Identificateur
+node_42 [label="0" ];//expression3
+node_40 -> node_41
+node_40 -> node_42
+node_2 -> node_40
+node_44 [label="WHILE" ];//WHILE
+node_45 [label=">="];//cond3
+node_46 [label="i"];//Identificateur
+node_47 [label="-" ];//expression3
+node_48 [label="20" ];//expression3
+node_47 -> node_48
+node_45 -> node_46
+node_45 -> node_47
+node_49 [label="BLOC" shape=ellipse];//bloc
+node_50 [label="printd" shape=septagon];//appel
+node_51 [label="i"];//Identificateur
+node_50 -> node_51
+node_49 -> node_50
+node_53 [label=":=" ];//affectation
+node_54 [label="i"];//Identificateur
+node_55 [label="-" ];//expression1
+node_56 [label="i"];//Identificateur
+node_57 [label="1" ];//expression3
+node_55 -> node_56
+node_55 -> node_57
+node_53 -> node_54
+node_53 -> node_55
+node_49 -> node_53
+node_44 -> node_45
+node_44 -> node_49
+node_2 -> node_44
+node_61 [label="RETURN" shape=trapezium color=blue];//RETURN
+node_62 [label="0" ];//expression3
+node_61 -> node_62
+node_2 -> node_61
+node_1 -> node_2
+}

@@ -1,0 +1,46 @@
+digraph diagram1 {
+//programme
+node_1 [label="main,int" shape=invtrapezium color=blue];//fonction
+ node_2 [label="BLOC" shape=ellipse];//bloc
+node_3 [label="FOR" ];//FOR
+node_4 [label=":=" ];//affectation
+node_5 [label="i"];//Identificateur
+node_6 [label="0" ];//expression3
+node_4 -> node_5
+node_4 -> node_6
+node_7 [label="<"];//cond3
+node_8 [label="i"];//Identificateur
+node_9 [label="10" ];//expression3
+node_7 -> node_8
+node_7 -> node_9
+node_10 [label=":=" ];//affectation
+node_11 [label="i"];//Identificateur
+node_12 [label="+" ];//expression1
+node_13 [label="i"];//Identificateur
+node_14 [label="1" ];//expression3
+node_12 -> node_13
+node_12 -> node_14
+node_10 -> node_11
+node_10 -> node_12
+node_15 [label="BLOC" shape=ellipse];//bloc
+node_16 [label="IF" shape=diamond];//IF0
+node_17 [label="=="];//cond3
+node_18 [label="i"];//Identificateur
+node_19 [label="5" ];//expression3
+node_17 -> node_18
+node_17 -> node_19
+node_20 [label="BREAK" shape=square];//BREAK
+node_16 -> node_17
+node_16 -> node_20
+node_15 -> node_16
+node_3 -> node_4
+node_3 -> node_7
+node_3 -> node_10
+node_3 -> node_15
+node_2 -> node_3
+node_25 [label="printd" shape=septagon];//appel
+node_26 [label="i"];//Identificateur
+node_25 -> node_26
+node_2 -> node_25
+node_1 -> node_2
+}
